@@ -26,21 +26,25 @@ setPecaColuna(N,Peca,[Peca1|Resto],[Peca1|Mais]):-
 :-dynamic treesEaten/2.
 :-dynamic players/2.
 :-dynamic tab/1.
+:-dynamic yuki/2.
+:-dynamic mina/2.
 :-dynamic nextPlayer/1.
 
 wins(0,0).
-treesEaten(1,0).
+treesEaten(0,0).
 players(y,m).
 tab([[t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,y,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,m,t,t],
+    [t,t,t,t,t,t,t,t,t,t],
+    [t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t]]).
+yuki(0,0).
+mina(0,0).
 nextPlayer(p1).
 
 display_game(Board,Player):-
@@ -89,18 +93,32 @@ write_name(Name):-
     write('playing as Mina')).
 
 move(Line,Col):-
-    nextPlayer(N),
+    players(P1,P2),
+    P1 = y,
+    format('~p~n',N), %ERRO
+    nextPlayer(Player),
     tab(T),
-    retract(nextPlayer(N)),
+    retract(nextPlayer(Player)),
     retract(tab(T)),
+    (Player=p1,
+    N = P1);
+    (Player=p2,
+    N = P2),
     setPeca(Line,Col,N,T,New),
     assert(tab(New)),
-    (N = y,
-    assert(nextPlayer(m)));
-    (N = m,
-    assert(nextPlayer(y))).
+    (Player=p1,
+    assert(nextPlayer(p2)));
+    (Player=p2,
+    assert(nextPlayer(p1))).
 
+%USE REPEAT
 joga(_):-
+    tab(T),
+    nextPlayer(P),
+    display_game(T,P),
+    write('Line: '),
     read(Line),
+    write('Col: '),
     read(Col),
-    move(Line,Col).
+    move(Line,Col),
+    joga(_).
