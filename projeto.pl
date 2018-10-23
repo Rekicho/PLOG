@@ -22,33 +22,51 @@ setPecaColuna(N,Peca,[Peca1|Resto],[Peca1|Mais]):-
     Next is N-1,
     setPecaColuna(Next,Peca,Resto,Mais).
 
+:-dynamic wins/2.
+:-dynamic treesEaten/2.
+:-dynamic players/2.
 :-dynamic tab/1.
 :-dynamic nextPlayer/1.
-:-dynamic treesEaten/2.
-:-dynamic wins/2.
-	
-tab([[t,t,t,t,t,t,t,t,t,t],[t,t,t,t,t,t,t,t,t,t],[t,t,t,t,t,t,t,t,t,t],[t,t,t,t,t,t,t,t,t,t],[t,t,t,t,t,t,t,t,t,t],[t,t,t,t,t,t,t,t,t,t],[t,t,t,t,t,t,t,t,t,t],[t,t,t,t,t,t,t,t,t,t],[t,t,t,t,t,t,t,t,t,t],[t,t,t,t,t,t,t,t,t,t]]).
-nextPlayer(y).
-treesEaten(0,0).
-wins(0).
+
+wins(0,0).
+treesEaten(1,0).
+players(y,m).
+tab([[t,t,t,t,t,t,t,t,t,t],
+    [t,t,t,t,t,t,t,t,t,t],
+    [t,t,t,t,t,t,t,t,t,t],
+    [t,t,t,t,t,t,t,t,t,t],
+    [t,t,t,t,t,t,t,t,t,t],
+    [t,t,t,t,y,t,t,t,t,t],
+    [t,t,t,t,t,t,t,t,t,t],
+    [t,t,t,t,t,t,t,t,t,t],
+    [t,t,t,t,t,t,t,m,t,t],
+    [t,t,t,t,t,t,t,t,t,t]]).
+nextPlayer(p1).
 
 display_game(Board,Player):-
-    display_board(Board),
-    format('~n~nPlayer to move: ~p~n',Player).
+    display_board(0,Board),
+    format('~n~nPlayer to move: ~p ',Player),
+    display_player(Player),
+    nl.
 
-display_board([Head]):-
-    write('------------------------------'),
+display_board(Counter,[Head]):-
+    write('  ------------------------------'),
     nl,
+    format('~d ',Counter),
     display_line(Head),
     nl,
-    write('------------------------------').
-
-display_board([Head|Tail]):-
-    write('------------------------------'),
+    write('  ------------------------------'),
     nl,
+    write('   0  1  2  3  4  5  6  7  8  9 ').
+
+display_board(Counter,[Head|Tail]):-
+    write('  ------------------------------'),
+    nl,
+    format('~d ',Counter),
     display_line(Head),
     nl,
-    display_board(Tail).
+    Next is Counter+1,
+    display_board(Next,Tail).
 
 display_line([Head]):-
     format('|~p|',Head).
@@ -56,6 +74,19 @@ display_line([Head]):-
 display_line([Head|Tail]):-
     format('|~p|',Head),
     display_line(Tail).
+
+display_player(Player):-
+    players(P1,P2),
+    (Player=p1,
+    write_name(P1));
+    (Player=p2,
+    write_name(P2)).
+
+write_name(Name):-
+    (Name=y,
+    write('playing as Yuki'));
+    (Name=m,
+    write('playing as Mina')).
 
 move(Line,Col):-
     nextPlayer(N),
