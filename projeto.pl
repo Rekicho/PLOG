@@ -28,6 +28,7 @@ setPecaColuna(N,Peca,[Peca1|Resto],[Peca1|Mais]):-
 :-dynamic tab/1.
 :-dynamic yuki/2.
 :-dynamic mina/2.
+:-dynamic before_mina/1.
 :-dynamic nextPlayer/1.
 
 wins(0,0).
@@ -43,29 +44,27 @@ tab([[t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t]]).
-yuki(0,0).
-mina(0,0).
+yuki(-1,-1).
+mina(-1,-1). 
+%In the start, yuki and mina are not on the board
+before_mina(m). %In the start, there is nothing in the place where mina is
 nextPlayer(p1).
 
 display_game(Board,Player):-
+    nl,
     display_board(0,Board),
     format('~n~nPlayer to move: ~p ',Player),
     display_player(Player),
     nl.
 
 display_board(Counter,[Head]):-
-    write('  ------------------------------'),
-    nl,
     format('~d ',Counter),
     display_line(Head),
     nl,
-    write('  ------------------------------'),
     nl,
-    write('   0  1  2  3  4  5  6  7  8  9 ').
+    write('   a  b  c  d  e  f  g  h  i  j ').
 
 display_board(Counter,[Head|Tail]):-
-    write('  ------------------------------'),
-    nl,
     format('~d ',Counter),
     display_line(Head),
     nl,
@@ -73,18 +72,22 @@ display_board(Counter,[Head|Tail]):-
     display_board(Next,Tail).
 
 display_line([Head]):-
-    format('|~p|',Head).
+    (Head = w,
+    write('   '));
+    format(' ~p ',Head).
 
 display_line([Head|Tail]):-
-    format('|~p|',Head),
+    ((Head = w,
+    write('   '));
+    format(' ~p ',Head)),
     display_line(Tail).
 
 display_player(Player):-
     players(P1,P2),
-    (Player=p1,
+    ((Player=p1,
     write_name(P1));
     (Player=p2,
-    write_name(P2)).
+    write_name(P2))).
 
 write_name(Name):-
     (Name=y,
@@ -92,33 +95,49 @@ write_name(Name):-
     (Name=m,
     write('playing as Mina')).
 
-move(Line,Col):-
+moveYuki(L,C,T,New):-
+    %yuki(X,Y),
+    setPeca(L,C,y,T,New).
+
+moveMina(L,C,T,New):-
+    %mina(X,Y),
+    setPeca(L,C,m,T,New).
+
+move(L,C,N,T,New):-
+    (N = y,
+    moveYuki(L,C,T,New));
+    (N = m,
+    moveMina(L,C,T,New)).
+
+play(Line,Col):-
     players(P1,P2),
-    P1 = y,
-    format('~p~n',N), %ERRO
     nextPlayer(Player),
     tab(T),
     retract(nextPlayer(Player)),
     retract(tab(T)),
-    (Player=p1,
+    ((Player=p1,
     N = P1);
     (Player=p2,
-    N = P2),
-    setPeca(Line,Col,N,T,New),
+    N = P2)),
+    L is Line + 1,
+    C is Col + 1,
+    move(L,C,N,T,New),
     assert(tab(New)),
-    (Player=p1,
+    ((Player=p1,
     assert(nextPlayer(p2)));
     (Player=p2,
-    assert(nextPlayer(p1))).
+    assert(nextPlayer(p1)))).
 
 %USE REPEAT
-joga(_):-
+joga:-
     tab(T),
     nextPlayer(P),
     display_game(T,P),
     write('Line: '),
     read(Line),
     write('Col: '),
-    read(Col),
-    move(Line,Col),
-    joga(_).
+    read(Char),
+    char_code(Char,Code),
+    Col is Code - 97,
+    play(Line,Col),
+    joga.
