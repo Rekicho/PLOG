@@ -28,7 +28,7 @@ setPecaColuna(N,Peca,[Peca1|Resto],[Peca1|Mais]):-
 :-dynamic tab/1.
 :-dynamic yuki/2.
 :-dynamic mina/2.
-:-dynamic before_mina/1.
+:-dynamic beforeMina/1.
 :-dynamic nextPlayer/1.
 
 wins(0,0).
@@ -47,11 +47,14 @@ tab([[t,t,t,t,t,t,t,t,t,t],
 yuki(-1,-1).
 mina(-1,-1). 
 %In the start, yuki and mina are not on the board
-before_mina(m). %In the start, there is nothing in the place where mina is
+beforeMina(m). %In the start, there is nothing in the place where mina is
 nextPlayer(p1).
 
 display_game(Board,Player):-
-    nl,
+    wins(W1,W2),
+    format('~nWins: ~d-~d~n',[W1,W2]),
+    treesEaten(T1,T2),
+    format('Trees eaten: ~d-~d~n~n',[T1,T2]),
     display_board(0,Board),
     format('~n~nPlayer to move: ~p ',Player),
     display_player(Player),
@@ -95,17 +98,50 @@ write_name(Name):-
     (Name=m,
     write('playing as Mina')).
 
-moveYuki(L,C,T,New):-
-    %yuki(X,Y),
-    setPeca(L,C,y,T,New).
+moveYuki(P,L,C,T,New):-
+    yuki(X,Y),
+    treesEaten(T1,T2),
+    ((X < 0,
+    Y < 0,
+    setPeca(L,C,y,T,New));
+    (OldX is X + 1,
+    OldY is Y + 1,
+    setPeca(OldX,OldY,w,T,Next),
+    setPeca(L,C,y,Next,New))),
+    retract(yuki(X,Y)),
+    retract(treesEaten(T1,T2)),
+    NewX is L - 1,
+    NewY is C - 1,
+    assert(yuki(NewX,NewY)),
+    ((Player = p1,
+    NewT is T1 + 1,
+    assert(treesEaten(NewT,T2)));
+    (Player = p2,
+    NewT is T2 + 1,
+    assert(treesEaten(T1,NewT)))).
 
 moveMina(L,C,T,New):-
-    %mina(X,Y),
-    setPeca(L,C,m,T,New).
+    mina(X,Y),
+    beforeMina(Before),
+    ((X < 0,
+    Y < 0,
+    getPeca(L,C,T,After),
+    setPeca(L,C,m,T,New));
+    (OldX is X + 1,
+    OldY is Y + 1,
+    setPeca(OldX,OldY,Before,T,Next),
+    getPeca(L,C,T,After),
+    setPeca(L,C,m,Next,New))),
+    retract(mina(X,Y)),
+    retract(beforeMina(Before)),
+    NewX is L - 1,
+    NewY is C - 1,
+    assert(mina(NewX,NewY)),
+    assert(beforeMina(After)).
 
-move(L,C,N,T,New):-
+move(P,L,C,N,T,New):-
     (N = y,
-    moveYuki(L,C,T,New));
+    moveYuki(P,L,C,T,New));
     (N = m,
     moveMina(L,C,T,New)).
 
@@ -121,7 +157,7 @@ play(Line,Col):-
     N = P2)),
     L is Line + 1,
     C is Col + 1,
-    move(L,C,N,T,New),
+    move(Player,L,C,N,T,New),
     assert(tab(New)),
     ((Player=p1,
     assert(nextPlayer(p2)));
