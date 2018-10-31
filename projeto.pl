@@ -45,7 +45,7 @@ tab([[t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t],
     [t,t,t,t,t,t,t,t,t,t]]).
 yuki(-1,-1).
-mina(-1,-1). 
+mina(-1,-1).
 %In the start, yuki and mina are not on the board
 beforeMina(m). %In the start, there is nothing in the place where mina is
 nextPlayer(p1).
@@ -98,6 +98,8 @@ write_name(Name):-
     (Name=m,
     write('playing as Mina')).
 
+checkYukiMove(L,C,T).
+
 moveYuki(P,L,C,T,New):-
     yuki(X,Y),
     treesEaten(T1,T2),
@@ -120,6 +122,22 @@ moveYuki(P,L,C,T,New):-
     NewT is T2 + 1,
     assert(treesEaten(T1,NewT)))).
 
+%TODO:CHECK NOT SEEN
+checkMinaMove(L,C,T):-
+    mina(X,Y),
+    ((X = -1,
+    Y = -1);
+    (LDif is (L - (X + 1)),
+    CDif is (C - (Y + 1)),
+    ((LDif = 0,
+    CDif \= 0);
+    (LDif \= 0,
+    CDif = 0);
+    (LDif = CDif);
+    (NewDif is Y + 1 - C,
+    LDif = NewDif)))).
+
+
 moveMina(L,C,T,New):-
     mina(X,Y),
     beforeMina(Before),
@@ -141,16 +159,16 @@ moveMina(L,C,T,New):-
 
 move(P,L,C,N,T,New):-
     (N = y,
+    checkYukiMove(L,C,T),
     moveYuki(P,L,C,T,New));
     (N = m,
+    checkMinaMove(L,C,T),
     moveMina(L,C,T,New)).
 
 play(Line,Col):-
     players(P1,P2),
     nextPlayer(Player),
     tab(T),
-    retract(nextPlayer(Player)),
-    retract(tab(T)),
     ((Player=p1,
     N = P1);
     (Player=p2,
@@ -158,13 +176,21 @@ play(Line,Col):-
     L is Line + 1,
     C is Col + 1,
     move(Player,L,C,N,T,New),
+    retract(nextPlayer(Player)),
+    retract(tab(T)),
     assert(tab(New)),
     ((Player=p1,
     assert(nextPlayer(p2)));
     (Player=p2,
     assert(nextPlayer(p1)))).
 
-%USE REPEAT
+checkInput(Line,Col):-
+    Line >= 0,
+    Line =< 9,
+    Col >= 0,
+    Col =< 9.
+
+%TODO: ADD REPEAT
 joga:-
     tab(T),
     nextPlayer(P),
@@ -175,5 +201,10 @@ joga:-
     read(Char),
     char_code(Char,Code),
     Col is Code - 97,
+    ((checkInput(Line,Col),
     play(Line,Col),
-    joga.
+    joga);
+    (nl,
+    write('Wrong Move!!!'),
+    nl,
+    joga)).
