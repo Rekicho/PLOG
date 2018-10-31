@@ -98,8 +98,31 @@ write_name(Name):-
     (Name=m,
     write('playing as Mina')).
 
-checkYukiMove(L,C,T).
+coprime(X,Y).%TODO
 
+canSee(X,Y,MX,MY).
+    DX is abs(MX - X),
+    DY is abs(MY - Y),
+    coprime(DX,DY).
+
+checkYukiMove(L,C,T):-
+    yuki(X,Y),
+    getPeca(L,C,T,Peca),
+    Peca = t,
+    mina(MX,MY),
+    canSee(X,Y,MX,MY),
+    ((X = -1,
+    Y = -1);
+    (LDif is (L - (X + 1)),
+    CDif is (C - (Y + 1)),
+    ((LDif = 0,
+    CDif = 1);
+    (LDif = 1,
+    CDif = 0);
+    (abs(LDif) =:= abs(CDif),
+    abs(LDif) =:= 1)))).
+
+%TODO: CHECK SEE
 moveYuki(P,L,C,T,New):-
     yuki(X,Y),
     treesEaten(T1,T2),
@@ -115,10 +138,10 @@ moveYuki(P,L,C,T,New):-
     NewX is L - 1,
     NewY is C - 1,
     assert(yuki(NewX,NewY)),
-    ((Player = p1,
+    ((P = p1,
     NewT is T1 + 1,
     assert(treesEaten(NewT,T2)));
-    (Player = p2,
+    (P = p2,
     NewT is T2 + 1,
     assert(treesEaten(T1,NewT)))).
 
@@ -133,9 +156,7 @@ checkMinaMove(L,C,T):-
     CDif \= 0);
     (LDif \= 0,
     CDif = 0);
-    (LDif = CDif);
-    (NewDif is Y + 1 - C,
-    LDif = NewDif)))).
+    (abs(LDif) =:= abs(CDif))))).
 
 
 moveMina(L,C,T,New):-
@@ -184,6 +205,7 @@ play(Line,Col):-
     (Player=p2,
     assert(nextPlayer(p1)))).
 
+%TODO: Check Line not char, Check Col not number
 checkInput(Line,Col):-
     Line >= 0,
     Line =< 9,
