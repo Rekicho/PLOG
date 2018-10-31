@@ -100,7 +100,8 @@ write_name(Name):-
 
 coprime(X,Y).%TODO
 
-canSee(X,Y,MX,MY).
+%CHECK NOT TREE
+canSee(X,Y,MX,MY,T).
     DX is abs(MX - X),
     DY is abs(MY - Y),
     coprime(DX,DY).
@@ -110,7 +111,9 @@ checkYukiMove(L,C,T):-
     getPeca(L,C,T,Peca),
     Peca = t,
     mina(MX,MY),
-    canSee(X,Y,MX,MY),
+    NewX is L-1,
+    NewY is C-1,
+    canSee(NewX,NewY,MX,MY,T),
     ((X = -1,
     Y = -1);
     (LDif is (L - (X + 1)),
@@ -122,7 +125,6 @@ checkYukiMove(L,C,T):-
     (abs(LDif) =:= abs(CDif),
     abs(LDif) =:= 1)))).
 
-%TODO: CHECK SEE
 moveYuki(P,L,C,T,New):-
     yuki(X,Y),
     treesEaten(T1,T2),
@@ -145,9 +147,12 @@ moveYuki(P,L,C,T,New):-
     NewT is T2 + 1,
     assert(treesEaten(T1,NewT)))).
 
-%TODO:CHECK NOT SEEN
 checkMinaMove(L,C,T):-
     mina(X,Y),
+    yuki(YX,YY),
+    NewX is L-1,
+    NewY is C-1,
+    not(canSee(YX,YY,NewX,NewY,T)), %CHECK NOT
     ((X = -1,
     Y = -1);
     (LDif is (L - (X + 1)),
