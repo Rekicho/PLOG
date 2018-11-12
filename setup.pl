@@ -40,9 +40,43 @@ allMoves([
 ]).
 
 %Faster hardcoded than calculated at run time
-%FINISH COPRIMES
-%coprime(0,0):- 
-    %fail.
-%coprime(0,_).
-%coprime(_,0).
-coprime(_,_).
+coprime(1,_).
+coprime(_,1).
+coprime(2,3).
+coprime(2,5).
+coprime(2,7).
+coprime(2,9).
+coprime(3,2).
+coprime(3,4).
+coprime(3,5).
+coprime(3,7).
+coprime(3,8).
+coprime(4,3).
+coprime(4,5).
+coprime(4,7).
+coprime(4,9).
+coprime(5,2).
+coprime(5,3).
+coprime(5,4).
+coprime(5,6).
+coprime(5,7).
+coprime(5,8).
+coprime(5,9).
+coprime(6,5).
+coprime(6,7).
+coprime(7,2).
+coprime(7,3).
+coprime(7,4).
+coprime(7,5).
+coprime(7,6).
+coprime(7,8).
+coprime(7,9).
+coprime(8,3).
+coprime(8,5).
+coprime(8,7).
+coprime(8,9).
+coprime(9,2).
+coprime(9,4).
+coprime(9,5).
+coprime(9,7).
+coprime(9,8).

@@ -6,39 +6,40 @@
 :- reconsult('yuki.pl').
 :- reconsult('mina.pl').
 
-%CHECK NOT TREE
+%TODO:
+checkTrees(X,Y,MX,MY,T).
+
 canSee(X,Y,MX,MY,T):-
     DX is abs(MX - X),
     DY is abs(MY - Y),
-    coprime(DX,DY).
+    ((coprime(DX,DY));
+    (checkTrees(X,Y,MX,MY,T),
+    fail)).
 
-move(P,L,C,N,T,New):-
-    (N = y,
-    checkYukiMove(L,C,T),
-    moveYuki(P,L,C,T,New));
-    (N = m,
-    checkMinaMove(L,C,T),
-    moveMina(L,C,T,New)).
-
-play(Line,Col):-
+%CHECK VALID MOVES INSTEAD OF CHECK_YUKI_MOVE AND CHECK_MINA_MOVE
+move(Move,Board,NewBoard):-
+    [Line,Col] = Move,
     players(P1,P2),
     nextPlayer(Player),
-    tab(T),
     ((Player=p1,
     N = P1);
     (Player=p2,
     N = P2)),
     L is Line + 1,
     C is Col + 1,
-    move(Player,L,C,N,T,New),
+    ((N = y,
+    checkYukiMove(L,C,T),
+    moveYuki(Player,L,C,Board,NewBoard));
+    (N = m,
+    checkMinaMove(L,C,T),
+    moveMina(L,C,Board,NewBoard))),
     retract(nextPlayer(Player)),
-    retract(tab(T)),
-    assert(tab(New)),
     ((Player=p1,
     assert(nextPlayer(p2)));
     (Player=p2,
     assert(nextPlayer(p1)))).
 
+%CHECK MINA YUKI NOT SAME POSITION
 valid_moves(Board, Player, ListOfMoves):-
     players(P1,P2),
     ((Player = p1,
@@ -50,9 +51,8 @@ valid_moves(Board, Player, ListOfMoves):-
     (Name=m,
     valid_moves_mina(Board, ListOfMoves))).
 
-%FIX REPEAT
+%USE REPEAT
 joga:-
-    repeat,
     tab(T),
     nextPlayer(P),
     display_game(T,P),
@@ -60,7 +60,9 @@ joga:-
     display_moves(Moves),
     getInput(Line,Col),
     ((checkInput(Line,Col),
-    play(Line,Col));
+    move([Line,Col], T, NewT),
+    retract(tab(T)),
+    assert(tab(NewT)));
     (write('\nWrong Move!!!\n'))),
     joga.
     

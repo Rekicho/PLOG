@@ -44,7 +44,17 @@ write_name(Name):-
     (Name=m,
     write('playing as Mina')).
 
+translate_moves([],NewMoves,NewMoves).
+
+translate_moves([Head|Tail],PastMoves,NewMoves):-
+    [X|Y] = Head,
+    Code is Y + 97,
+    char_code(Char,Code),
+    append(PastMoves,[[X,Char]],MoreMoves),
+    translate_moves(Tail,MoreMoves,NewMoves).
+
 display_moves(Moves):-
     write('\nValid moves: \n\n'),
-    write(Moves),
+    translate_moves(Moves,[],NewMoves),
+    write(NewMoves),
     write('\n\n').
