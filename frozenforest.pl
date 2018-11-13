@@ -7,22 +7,29 @@
 :- reconsult('yuki.pl').
 :- reconsult('mina.pl').
 
+not( X ) :- X, !, fail.
+not( _ ).
+
 gcd(X,Y,G):-
     X = Y,
+    !,
     G = X.
 
 gcd(X,Y,G):-
     X < Y,
+    !,
     NextY is Y - X,
     gcd(X,NextY,G).
 
 gcd(X,Y,G):-
     X > Y,
+    !,
     gcd(Y, X, G).
 
 coprime(X,Y):-
     X > 0,
     Y > 0,
+    !,
     gcd(X,Y,G),
     G = 1.
 
@@ -31,12 +38,14 @@ untilZero(0,List,List,_).
 untilZero(Num,List,FullList,Coord):-
     Next is Num - 1,
     ((Coord = x,
+    !,
     append(List,[[Num,0]],NextList));
     (Coord = y,
+    !,
     append(List,[[0,Num]],NextList))),
     untilZero(Next,NextList,FullList,Coord).
 
-allpoints(X,Y,M,DX,DY,List,List):-
+allpoints(X,Y,_,DX,DY,List,List):-
     (floor(X) >= DX,
     !);
     (floor(Y) >= DY,
@@ -46,34 +55,65 @@ allpoints(X,Y,M,DX,DY,Points,List):-
     ((FY is floor(Y),
     CY is ceiling(Y),
     FY =:= CY,
+    !,
     append(Points,[[X,FY]],MorePoints));
     (MorePoints = Points)),
-    !,
     NextX is X + 1,
     NextY is Y + M,
     allpoints(NextX,NextY,M,DX,DY,MorePoints,List).
 
 possibleTrees(DX,DY,List):-
     ((DX =:= 0,
+    !,
     LastY is DY - 1,
     untilZero(LastY,[],List,y));
     (DY =:= 0,
+    !,
     LastX is DX - 1,
     untilZero(LastX,[],List,x));
     (M is DY/DX,
     allpoints(1,M,M,DX,DY,[],List))).
 
-%TODO: CHECK LIST FOR TREES
+changeSign(_,_,[],NewList,NewList).
+
+changeSign(SX,SY,[Head|Tail],LastList,NewList):-
+    [X|Y] = Head,
+    NewX is X * SX,
+    NewY is Y * SY,
+    append(LastList,[[NewX,NewY]],List),
+    changeSign(SX,SY,Tail,List,NewList).
+
+checkTree(_,_,_,[]):-
+    fail.
+
+checkTree(X,Y,Board,[Head|Tail]):-
+    [DX|DY] = Head,
+    Line is X + DX + 1,
+    Col is Y + DY + 1,
+    getPeca(Line,Col,Board,Peca),
+    ((Peca = t);
+    (checkTree(X,Y,Board,Tail))).
+
 checkTrees(X,Y,MX,MY,Board,DX,DY):-
-    possibleTrees(DX,DY,List).
+    possibleTrees(DX,DY,List),
+    ((DX = 0,
+    !,
+    SX is 0,
+    SY is floor((MY - Y)/DY));
+    (DY = 0,
+    !,
+    SY is 0,
+    SX is floor((MX - X)/DX));
+    (SX is floor((MX - X)/DX),
+    SY is floor((MY - Y)/DY))),
+    changeSign(SX,SY,List,[],NewList),
+    checkTree(X,Y,Board,NewList).
 
 canSee(X,Y,MX,MY,Board):-
     DX is abs(MX - X),
     DY is abs(MY - Y),
     ((coprime(DX,DY));
-    ((checkTrees(X,Y,MX,MY,Board,DX,DY),
-    fail);
-    (true))).
+    (not(checkTrees(X,Y,MX,MY,Board,DX,DY)))).
 
 move(Move,Board,NewBoard):-
     [Line,Col] = Move,
@@ -130,7 +170,6 @@ game_over(Board,Winner):-
 %USE REPEAT
 play:-
     prompt(_, ''),
-    repeat,
     tab(Board),
     nextPlayer(Player),
     display_game(Board,Player),
