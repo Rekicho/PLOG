@@ -7,15 +7,73 @@
 :- reconsult('yuki.pl').
 :- reconsult('mina.pl').
 
-%TODO:
-checkTrees(X,Y,MX,MY,T).
+gcd(X,Y,G):-
+    X = Y,
+    G = X.
 
-canSee(X,Y,MX,MY,T):-
+gcd(X,Y,G):-
+    X < Y,
+    NextY is Y - X,
+    gcd(X,NextY,G).
+
+gcd(X,Y,G):-
+    X > Y,
+    gcd(Y, X, G).
+
+coprime(X,Y):-
+    X > 0,
+    Y > 0,
+    gcd(X,Y,G),
+    G = 1.
+
+untilZero(0,List,List,_).
+
+untilZero(Num,List,FullList,Coord):-
+    Next is Num - 1,
+    ((Coord = x,
+    append(List,[[Num,0]],NextList));
+    (Coord = y,
+    append(List,[[0,Num]],NextList))),
+    untilZero(Next,NextList,FullList,Coord).
+
+allpoints(X,Y,M,DX,DY,List,List):-
+    (floor(X) >= DX,
+    !);
+    (floor(Y) >= DY,
+    !).
+
+allpoints(X,Y,M,DX,DY,Points,List):-
+    ((FY is floor(Y),
+    CY is ceiling(Y),
+    FY =:= CY,
+    append(Points,[[X,FY]],MorePoints));
+    (MorePoints = Points)),
+    !,
+    NextX is X + 1,
+    NextY is Y + M,
+    allpoints(NextX,NextY,M,DX,DY,MorePoints,List).
+
+possibleTrees(DX,DY,List):-
+    ((DX =:= 0,
+    LastY is DY - 1,
+    untilZero(LastY,[],List,y));
+    (DY =:= 0,
+    LastX is DX - 1,
+    untilZero(LastX,[],List,x));
+    (M is DY/DX,
+    allpoints(1,M,M,DX,DY,[],List))).
+
+%TODO: CHECK LIST FOR TREES
+checkTrees(X,Y,MX,MY,Board,DX,DY):-
+    possibleTrees(DX,DY,List).
+
+canSee(X,Y,MX,MY,Board):-
     DX is abs(MX - X),
     DY is abs(MY - Y),
     ((coprime(DX,DY));
-    (checkTrees(X,Y,MX,MY,T),
-    fail)).
+    ((checkTrees(X,Y,MX,MY,Board,DX,DY),
+    fail);
+    (true))).
 
 move(Move,Board,NewBoard):-
     [Line,Col] = Move,
