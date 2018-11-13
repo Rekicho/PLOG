@@ -1,37 +1,19 @@
-%LEGACY
-checkMinaMove(L,C,T):-
-    mina(X,Y),
-    yuki(YX,YY),
-    NewX is L-1,
-    NewY is C-1,
-    %not(canSee(YX,YY,NewX,NewY,T)), %CHECK NOT
-    ((X = -1,
-    Y = -1);
-    (LDif is (L - (X + 1)),
-    CDif is (C - (Y + 1)),
-    ((LDif = 0,
-    CDif \= 0);
-    (LDif \= 0,
-    CDif = 0);
-    (abs(LDif) =:= abs(CDif))))).
-
-
-moveMina(L,C,T,New):-
+moveMina(Line,Col,Board,NewBoard):-
     mina(X,Y),
     beforeMina(Before),
     ((X < 0,
     Y < 0,
-    getPeca(L,C,T,After),
-    setPeca(L,C,m,T,New));
+    getPeca(Line,Col,Board,After),
+    setPeca(Line,Col,m,Board,NewBoard));
     (OldX is X + 1,
     OldY is Y + 1,
-    setPeca(OldX,OldY,Before,T,Next),
-    getPeca(L,C,T,After),
-    setPeca(L,C,m,Next,New))),
+    setPeca(OldX,OldY,Before,Board,Next),
+    getPeca(Line,Col,Board,After),
+    setPeca(Line,Col,m,Next,NewBoard))),
     retract(mina(X,Y)),
     retract(beforeMina(Before)),
-    NewX is L - 1,
-    NewY is C - 1,
+    NewX is Line - 1,
+    NewY is Col - 1,
     assert(mina(NewX,NewY)),
     assert(beforeMina(After)).
 
@@ -41,7 +23,10 @@ valid_move_mina(Board, X, Y, Moves, NewMoves, DX, DY):-
     Y > -1,
     Y < 10,
     yuki(YX,YY),
-    ((canSee(YX,YY,X,Y,Board),
+    ((X =:= YX,
+    Y =:= YY,
+    MoreMoves = Moves);
+    (canSee(YX,YY,X,Y,Board),
     MoreMoves = Moves);
     (append(Moves,[[X,Y]],MoreMoves))),
     NextX is X + DX,
@@ -54,7 +39,10 @@ checkSeen(_,[],ValidMoves,ValidMoves).
 checkSeen(Board,[Head|Tail],ListOfMoves,ValidMoves):-
     [X,Y] = Head,
     yuki(YX,YY),
-    ((canSee(YX,YY,X,Y,Board),
+    ((X =:= YX,
+    Y =:= YY,
+    checkSeen(Board,Tail,ListOfMoves,ValidMoves));
+    (canSee(YX,YY,X,Y,Board),
     checkSeen(Board,Tail,ListOfMoves,ValidMoves));
     (append(ListOfMoves,[Head],MoreMoves),
     checkSeen(Board,Tail,MoreMoves,ValidMoves))).

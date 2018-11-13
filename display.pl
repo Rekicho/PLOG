@@ -58,3 +58,10 @@ display_moves(Moves):-
     translate_moves(Moves,[],NewMoves),
     write(NewMoves),
     write('\n\n').
+
+display_winner(Winner):-
+    write('\n'),
+    write(Winner),
+    write(' won '),
+    display_player(Winner),
+    write('!!!\n').

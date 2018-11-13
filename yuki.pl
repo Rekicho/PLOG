@@ -1,42 +1,22 @@
-%LEGACY
-checkYukiMove(L,C,T):-
-    yuki(X,Y),
-    getPeca(L,C,T,Peca),
-    Peca = t,
-    mina(MX,MY),
-    NewX is L-1,
-    NewY is C-1,
-    canSee(NewX,NewY,MX,MY,T),
-    ((X =:= -1,
-    Y =:= -1);
-    (LDif is (L - (X + 1)),
-    CDif is (C - (Y + 1)),
-    ((LDif =:= 0,
-    abs(CDif) =:= 1);
-    (abs(LDif) =:= 1,
-    CDif =:= 0);
-    (abs(LDif) =:= abs(CDif),
-    abs(LDif) =:= 1)))).
-
-moveYuki(P,L,C,T,New):-
+moveYuki(Player,Line,Col,Board,NewBoard):-
     yuki(X,Y),
     treesEaten(T1,T2),
     ((X < 0,
     Y < 0,
-    setPeca(L,C,y,T,New));
+    setPeca(Line,Col,y,Board,NewBoard));
     (OldX is X + 1,
     OldY is Y + 1,
-    setPeca(OldX,OldY,w,T,Next),
-    setPeca(L,C,y,Next,New))),
+    setPeca(OldX,OldY,w,Board,Next),
+    setPeca(Line,Col,y,Next,NewBoard))),
     retract(yuki(X,Y)),
     retract(treesEaten(T1,T2)),
-    NewX is L - 1,
-    NewY is C - 1,
+    NewX is Line - 1,
+    NewY is Col - 1,
     assert(yuki(NewX,NewY)),
-    ((P = p1,
+    ((Player = p1,
     NewT is T1 + 1,
     assert(treesEaten(NewT,T2)));
-    (P = p2,
+    (Player = p2,
     NewT is T2 + 1,
     assert(treesEaten(T1,NewT)))).
   
