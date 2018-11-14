@@ -190,7 +190,8 @@ until_valid_move(Moves, Board, NewBoard):-
         display_moves(Moves),
         getInput(Line,Col),
         checkInput(Line,Col),
-        move([Line,Col], Board, NewBoard).
+        move([Line,Col], Board, NewBoard),
+        !.
 
 game_over(Board,Winner):-
     nextPlayer(Player),
@@ -252,7 +253,7 @@ match_over(Winner):-
 
 %USE REPEAT
 game:-
-    prompt(_, ''),
+    display_separator,
     board(Board),
     nextPlayer(Player),
     display_game(Board,Player),
@@ -276,4 +277,23 @@ game:-
     game.
 
 play:-
-    game.
+    prompt(_, ''),
+    display_main_menu,
+    repeat,
+    getOption(Option),
+    (
+        (Option =:= 0,
+        !,
+        true);
+
+        (Option =:= 1,
+        !,
+        setup,
+        game);
+
+        (Option =:= 2,
+        !,
+        game);
+
+        fail
+    ).

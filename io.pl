@@ -13,3 +13,8 @@ getInput(Line,Col):-
     not(number(Char)),
     char_code(Char,Code),
     Col is Code - 97.
+
+getOption(Option):-
+    write('\n\nOption: '),
+    read(Option),
+    number(Option).

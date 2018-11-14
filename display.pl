@@ -82,3 +82,19 @@ display_match_winner(Winner):-
         write(Winner),
         write('!!!\n\n\n'))
     ).
+
+display_separator:-
+    write('\n================================\n================================\n').
+
+display_main_menu:-
+    write('\n\n\n\n\n'),
+    write('  ______                             ______                      _\n'),
+    write(' |  ____|                           |  ____|                    | |\n'),
+    write(' | |__  _ __  ___  ____ ___  _ __   | |__  ___   _ __  ___  ___ | |_\n'),
+    write(' |  __||  __|/ _ \\|_  // _ \\|  _ \\  |  __|/ _ \\ |  __|/ _ \\/ __|| __|\n'),
+    write(' | |   | |  | (_) |/ /|  __/| | | | | |  | (_) || |  |  __/\\__ \\| |_\n'),
+    write(' |_|   |_|   \\___//___|\\___||_| |_| |_|   \\___/ |_|   \\___||___/ \\__|\n'),
+    write('\n\n\n\nSelect an option\n'),
+    write('\n1- New Game'),
+    write('\n2- Continue'),
+    write('\n0- Exit').
