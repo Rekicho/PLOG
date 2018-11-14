@@ -19,9 +19,3 @@ setPecaColuna(N,Peca,[Peca1|Resto],[Peca1|Mais]):-
     N>1,
     Next is N-1,
     setPecaColuna(Next,Peca,Resto,Mais).
-
-find(_,[]):- fail.
-
-find(Element,[Head|Tail]):-
-    Element == Head;
-    find(Element,Tail).

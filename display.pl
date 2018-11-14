@@ -22,25 +22,32 @@ display_board(Counter,[Head|Tail]):-
 
 display_line([Head]):-
     (Head = w,
-    write('   '));
+    write('   ')); 
     format(' ~p ',Head).
 
 display_line([Head|Tail]):-
-    ((Head = w,
-    write('   '));
-    format(' ~p ',Head)),
+    (
+        (Head = w,
+        write('   '));
+
+        format(' ~p ',Head)
+    ),
+
     display_line(Tail).
 
 display_player(Player):-
     players(P1,P2),
-    ((Player=p1,
-    write_name(P1));
-    (Player=p2,
-    write_name(P2))).
+    (
+        (Player=p1,
+        write_name(P1));
+
+        (Player=p2,
+        write_name(P2))
+    ).
 
 write_name(Name):-
     (Name=y,
-    write('playing as Yuki'));
+    write('playing as Yuki')); 
     (Name=m,
     write('playing as Mina')).
 
@@ -59,7 +66,7 @@ display_moves(Moves):-
     write(NewMoves),
     write('\n\n').
 
-display_winner(Winner):-
+display_game_winner(Winner):-
     write('\n'),
     write(Winner),
     write(' won '),
