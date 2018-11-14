@@ -1,32 +1,46 @@
 :-dynamic wins/2.
 :-dynamic treesEaten/2.
 :-dynamic players/2.
-:-dynamic tab/1.
+:-dynamic board/1.
 :-dynamic yuki/2.
 :-dynamic mina/2.
 :-dynamic beforeMina/1.
 :-dynamic nextPlayer/1.
+:-dynamic wonAs/1.
 
 wins(0,0).
 treesEaten(0,0).
 players(y,m).
-tab([
-    [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,t,t,t],
-    [t,t,t,t,t,t,t,t,t,t]
-    ]).
+initialBoard([
+             [t,t,t,t,t,t,t,t,t,t],
+             [t,t,t,t,t,t,t,t,t,t],
+             [t,t,t,t,t,t,t,t,t,t],
+             [t,t,t,t,t,t,t,t,t,t],
+             [t,t,t,t,t,t,t,t,t,t],
+             [t,t,t,t,t,t,t,t,t,t],
+             [t,t,t,t,t,t,t,t,t,t],
+             [t,t,t,t,t,t,t,t,t,t],
+             [t,t,t,t,t,t,t,t,t,t],
+             [t,t,t,t,t,t,t,t,t,t]
+             ]).
+board([
+      [t,t,t,t,t,t,t,t,t,t],
+      [t,t,t,t,t,t,t,t,t,t],
+      [t,t,t,t,t,t,t,t,t,t],
+      [t,t,t,t,t,t,t,t,t,t],
+      [t,t,t,t,t,t,t,t,t,t],
+      [t,t,t,t,t,t,t,t,t,t],
+      [t,t,t,t,t,t,t,t,t,t],
+      [t,t,t,t,t,t,t,t,t,t],
+      [t,t,t,t,t,t,t,t,t,t],
+      [t,t,t,t,t,t,t,t,t,t]
+      ]).
 yuki(-1,-1).
 mina(-1,-1).
 %In the start, yuki and mina are not on the board
 beforeMina(m). %In the start, there is nothing in the place where mina is
 nextPlayer(p1).
+wonAs(x). %In the start, no one won.
 
 allMoves([
             [0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],
@@ -40,3 +54,41 @@ allMoves([
             [8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7],[8,8],[8,9],
             [9,0],[9,1],[9,2],[9,3],[9,4],[9,5],[9,6],[9,7],[9,8],[9,9]
         ]).
+
+%Needs to retract in case player plays more than one match
+setup:-
+    retract(wins(_,_)),
+    retract(treesEaten(_,_)),
+    retract(players(_,_)),
+    retract(board(_)),
+    retract(yuki(_,_)),
+    retract(mina(_,_)),
+    retract(beforeMina(_)),
+    retract(nextPlayer(_)),
+    retract(wonAs(_)),
+    assert(wins(0,0)),
+    assert(treesEaten(0,0)),
+    assert(players(y,m)),
+    initialBoard(Board),
+    assert(board(Board)),
+    assert(yuki(-1,-1)),
+    assert(mina(-1,-1)),
+    assert(beforeMina(m)),
+    assert(nextPlayer(p1)),
+    assert(wonAs(x)).
+
+change_game:-
+    players(P1,P2),
+    retract(players(P1,P2)),
+    assert(players(P2,P1)),
+    retract(board(_)),
+    initialBoard(Board),
+    assert(board(Board)),
+    retract(yuki(_,_)),
+    retract(mina(_,_)),
+    assert(yuki(-1,-1)),
+    assert(mina(-1,-1)),
+    retract(beforeMina(_)),
+    retract(nextPlayer(_)),
+    assert(beforeMina(m)),
+    assert(nextPlayer(p2)).

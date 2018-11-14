@@ -72,3 +72,13 @@ display_game_winner(Winner):-
     write(' won '),
     display_player(Winner),
     write('!!!\n').
+
+display_match_winner(Winner):-
+    (
+        (Winner = t,
+        write('\n\n\nTHE MATCH WAS A TIE!!!\n\n\n'));
+
+        (write('\n\n\nTHE WINNER IS '),
+        write(Winner),
+        write('!!!\n\n\n'))
+    ).

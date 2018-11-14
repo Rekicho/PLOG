@@ -82,3 +82,16 @@ valid_moves_mina(Board, ListOfMoves):-
         valid_move_mina(Board, NextX, Y, Moves6, Moves7, 1, 0),
         valid_move_mina(Board, NextX, NextY, Moves7, ListOfMoves, 1, 1))
     ).
+
+solve_Mina_tie(T1,T2,Winner):-
+    (
+        (T1 > T2,
+        !,
+        Winner = p1);
+
+        (T1 < T2,
+        !,
+        Winner = p2);
+
+        (Winner = t)
+    ).

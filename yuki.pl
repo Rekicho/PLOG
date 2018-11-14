@@ -64,3 +64,16 @@ valid_moves_yuki(Board, ListOfMoves):-
         valid_move_yuki(Board, NextX, Y, Moves6, Moves7),
         valid_move_yuki(Board, NextX, NextY, Moves7, ListOfMoves))
     ).
+
+solve_Yuki_tie(T1,T2,Winner):-
+    (
+        (T1 > T2,
+        !,
+        Winner = p2);
+
+        (T1 < T2,
+        !,
+        Winner = p1);
+
+        (Winner = t)
+    ).

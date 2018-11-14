@@ -187,37 +187,93 @@ valid_moves(Board, Player, ListOfMoves):-
 
 until_valid_move(Moves, Board, NewBoard):-
     repeat,
-    display_moves(Moves),
-    getInput(Line,Col),
-    checkInput(Line,Col),
-    move([Line,Col], Board, NewBoard).
+        display_moves(Moves),
+        getInput(Line,Col),
+        checkInput(Line,Col),
+        move([Line,Col], Board, NewBoard).
 
 game_over(Board,Winner):-
     nextPlayer(Player),
     valid_moves(Board,Player,Moves),
     length(Moves,L),
     L =:= 0,
+    retract(wonAs(_)),
     (
         (Player = p1,
+        wins(W1,W2),
+        NewWin is W2 + 1,
+        retract(wins(W1,W2)),
+        assert(wins(W1,NewWin)),
+        players(_,P2),
+        assert(wonAs(P2)),
         Winner = p2);
 
         (Player = p2,
+        wins(W1,W2),
+        NewWin is W1 + 1,
+        retract(wins(W1,W2)),
+        assert(wins(NewWin,W2)),
+        players(P1,_),
+        assert(wonAs(P1)),
         Winner = p1)
     ).
 
+solve_tie(Winner):-
+    treesEaten(T1,T2),
+    (
+        (Name = y,
+        !,
+        solve_Yuki_tie(T1,T2,Winner));
+
+        (Name = m,
+        !,
+        solve_Mina_tie(T1,T2,Winner))
+    ).
+
+match_over(Winner):-
+    wins(W1,W2),
+    Wins is W1 + W2,
+    Wins =:= 2,
+    (
+        (
+            W1 > W2,
+            !,
+            Winner = p1
+        );
+
+        (
+            W1 < W2,
+            !,
+            Winner = p2
+        );
+
+        (solve_tie(Winner))
+    ).
+
 %USE REPEAT
-play:-
+game:-
     prompt(_, ''),
-    tab(Board),
+    board(Board),
     nextPlayer(Player),
     display_game(Board,Player),
     valid_moves(Board,Player,Moves),
     until_valid_move(Moves,Board,NewBoard),
-    retract(tab(Board)),
-    assert(tab(NewBoard)),
+    retract(board(Board)),
+    assert(board(NewBoard)),
     (
         (game_over(NewBoard,Winner),
-        display_game_winner(Winner));
+        display_game_winner(Winner),
+        (
+            (match_over(MatchWinner),
+            display_match_winner(MatchWinner),
+            fail);
 
-        (play)
-    ).
+            (change_game)
+        ));
+
+        (true)
+    ),
+    game.
+
+play:-
+    game.

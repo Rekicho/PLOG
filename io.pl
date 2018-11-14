@@ -10,6 +10,6 @@ getInput(Line,Col):-
     write('Col: '),
     read(Char),
     number(Line),
-    %string(Char), CHECK IF IT IS CHAR
+    not(number(Char)),
     char_code(Char,Code),
     Col is Code - 97.
