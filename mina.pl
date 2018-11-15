@@ -86,11 +86,9 @@ valid_moves_mina(Board, ListOfMoves):-
 solve_Mina_tie(T1,T2,Winner):-
     (
         (T1 > T2,
-        !,
         Winner = p1);
 
         (T1 < T2,
-        !,
         Winner = p2);
 
         (Winner = t)

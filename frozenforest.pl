@@ -6,6 +6,7 @@
 :- reconsult('io.pl').
 :- reconsult('yuki.pl').
 :- reconsult('mina.pl').
+:- reconsult('ai.pl').
 
 not( X ) :- X, !, fail.
 not( _ ).
@@ -221,13 +222,12 @@ game_over(Board,Winner):-
 
 solve_tie(Winner):-
     treesEaten(T1,T2),
+    wonAs(Name),
     (
         (Name = y,
-        !,
         solve_Yuki_tie(T1,T2,Winner));
 
         (Name = m,
-        !,
         solve_Mina_tie(T1,T2,Winner))
     ).
 
@@ -238,20 +238,17 @@ match_over(Winner):-
     (
         (
             W1 > W2,
-            !,
             Winner = p1
         );
 
         (
             W1 < W2,
-            !,
             Winner = p2
         );
 
         (solve_tie(Winner))
     ).
 
-%USE REPEAT
 game:-
     display_separator,
     board(Board),
@@ -267,7 +264,7 @@ game:-
         (
             (match_over(MatchWinner),
             display_match_winner(MatchWinner),
-            fail);
+            play);
 
             (change_game)
         ));
@@ -278,22 +275,27 @@ game:-
 
 play:-
     prompt(_, ''),
-    display_main_menu,
     repeat,
+    display_main_menu,
     getOption(Option),
     (
-        (Option =:= 0,
-        !,
-        true);
+        (Option =:= 0);
 
         (Option =:= 1,
-        !,
         setup,
-        game);
+        game,
+        play);
 
         (Option =:= 2,
         !,
-        game);
+        (
+            (match_over(_),
+            setup);
 
-        fail
+            (true)
+        ),
+        game,
+        play);
+
+        play
     ).

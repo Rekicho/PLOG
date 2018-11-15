@@ -86,15 +86,42 @@ display_match_winner(Winner):-
 display_separator:-
     write('\n================================\n================================\n').
 
-display_main_menu:-
+display_logo:-
     write('\n\n\n\n\n'),
     write('  ______                             ______                      _\n'),
     write(' |  ____|                           |  ____|                    | |\n'),
     write(' | |__  _ __  ___  ____ ___  _ __   | |__  ___   _ __  ___  ___ | |_\n'),
     write(' |  __||  __|/ _ \\|_  // _ \\|  _ \\  |  __|/ _ \\ |  __|/ _ \\/ __|| __|\n'),
     write(' | |   | |  | (_) |/ /|  __/| | | | | |  | (_) || |  |  __/\\__ \\| |_\n'),
-    write(' |_|   |_|   \\___//___|\\___||_| |_| |_|   \\___/ |_|   \\___||___/ \\__|\n'),
-    write('\n\n\n\nSelect an option\n'),
+    write(' |_|   |_|   \\___//___|\\___||_| |_| |_|   \\___/ |_|   \\___||___/ \\__|\n\n\n').
+
+display_main_menu:-
+    display_logo,
+    write('\n\nSelect an option\n'),
     write('\n1- New Game'),
     write('\n2- Continue'),
     write('\n0- Exit').
+
+display_type_menu:-
+    display_logo,
+    write('\n\nSelect an option\n'),
+    write('\n1- Player vs Player'),
+    write('\n2- Player vs Computer'),
+    write('\n3- Computer vs Computer'),
+    write('\n0- Back').
+
+display_PvAI_menu:-
+    display_logo,
+    write('\n\nSelect an option\n'),
+    write('\n1- Easy'),
+    write('\n2- Hard'),
+    write('\n0- Back').
+
+display_AIvAI_menu:-
+    display_logo,
+    write('\n\nSelect an option\n'),
+    write('\n1- Easy vs Easy'),
+    write('\n2- Easy vs Hard'),
+    write('\n3- Hard vs Easy'),
+    write('\n3- Hard vs Hard'),
+    write('\n0- Back').

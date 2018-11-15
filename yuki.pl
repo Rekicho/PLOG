@@ -68,11 +68,9 @@ valid_moves_yuki(Board, ListOfMoves):-
 solve_Yuki_tie(T1,T2,Winner):-
     (
         (T1 > T2,
-        !,
         Winner = p2);
 
         (T1 < T2,
-        !,
         Winner = p1);
 
         (Winner = t)
