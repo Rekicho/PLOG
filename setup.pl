@@ -7,6 +7,7 @@
 :-dynamic beforeMina/1.
 :-dynamic nextPlayer/1.
 :-dynamic wonAs/1.
+:-dynamic difficulty/2.
 
 wins(0,0).
 treesEaten(0,0).
@@ -41,6 +42,7 @@ mina(-1,-1).
 beforeMina(m). %In the start, there is nothing in the place where mina is
 nextPlayer(p1).
 wonAs(x). %In the start, no one won.
+difficulty(-1,-1).
 
 allMoves([
             [0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],
@@ -56,7 +58,7 @@ allMoves([
         ]).
 
 %Needs to retract in case player plays more than one match
-setup:-
+setup(AI1,AI2):-
     retract(wins(_,_)),
     retract(treesEaten(_,_)),
     retract(players(_,_)),
@@ -66,6 +68,7 @@ setup:-
     retract(beforeMina(_)),
     retract(nextPlayer(_)),
     retract(wonAs(_)),
+    retract(difficulty(_,_)),
     assert(wins(0,0)),
     assert(treesEaten(0,0)),
     assert(players(y,m)),
@@ -75,7 +78,8 @@ setup:-
     assert(mina(-1,-1)),
     assert(beforeMina(m)),
     assert(nextPlayer(p1)),
-    assert(wonAs(x)).
+    assert(wonAs(x)),
+    assert(difficulty(AI1,AI2)).
 
 change_game:-
     players(P1,P2),

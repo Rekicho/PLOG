@@ -102,26 +102,31 @@ display_main_menu:-
     write('\n2- Continue'),
     write('\n0- Exit').
 
-display_type_menu:-
+display_new_game_menu:-
     display_logo,
-    write('\n\nSelect an option\n'),
+    write('\n\nNew Game\n\nSelect an option\n'),
     write('\n1- Player vs Player'),
     write('\n2- Player vs Computer'),
     write('\n3- Computer vs Computer'),
-    write('\n0- Back').
+    write('\n0- Main Menu').
 
 display_PvAI_menu:-
     display_logo,
-    write('\n\nSelect an option\n'),
+    write('\n\nPlayer vs Computer\n\nSelect an option\n'),
     write('\n1- Easy'),
     write('\n2- Hard'),
-    write('\n0- Back').
+    write('\n0- Main Menu').
 
 display_AIvAI_menu:-
     display_logo,
-    write('\n\nSelect an option\n'),
+    write('\n\nComputer vs Computer\n\nSelect an option\n'),
     write('\n1- Easy vs Easy'),
     write('\n2- Easy vs Hard'),
-    write('\n3- Hard vs Easy'),
     write('\n3- Hard vs Hard'),
-    write('\n0- Back').
+    write('\n0- Main Menu').
+
+display_AI_move(Move):-
+    write('\n\nComputer chose Move: '),
+    write(Move),
+    write('\n\n').
+

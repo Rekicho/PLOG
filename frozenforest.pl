@@ -137,7 +137,7 @@ canSee(X,Y,MX,MY,Board):-
     ).
 
 move(Move,Board,NewBoard):-
-    [Line,Col] = Move,
+    [X,Y] = Move,
     players(P1,P2),
     nextPlayer(Player),
     valid_moves(Board, Player, Moves),
@@ -149,14 +149,14 @@ move(Move,Board,NewBoard):-
         (Player=p2,
         Name = P2)
     ),
-    L is Line + 1,
-    C is Col + 1,
+    Line is X + 1,
+    Col is Y + 1,
     (
         (Name = y,
-        moveYuki(Player,L,C,Board,NewBoard));
+        moveYuki(Player,Line,Col,Board,NewBoard));
 
         (Name = m,
-        moveMina(L,C,Board,NewBoard))
+        moveMina(Line,Col,Board,NewBoard))
     ),
     retract(nextPlayer(Player)),
     (
@@ -186,7 +186,7 @@ valid_moves(Board, Player, ListOfMoves):-
         !)
     ).
 
-until_valid_move(Moves, Board, NewBoard):-
+player_move(Moves, Board, NewBoard):-
     repeat,
         display_moves(Moves),
         getInput(Line,Col),
@@ -249,13 +249,38 @@ match_over(Winner):-
         (solve_tie(Winner))
     ).
 
+player_or_ai(Player, Difficulty):-
+    difficulty(D1,D2),
+    (
+        (Player = p1,
+        !,
+        Difficulty is D1);
+
+        (Player = p2,
+        !,
+        Difficulty is D2)
+    ).
+
+ai_move(Moves,Difficulty,Board,NewBoard):-
+    display_moves(Moves),
+    choose_move(Board, Difficulty, Move),
+    display_AI_move(Move),
+    move(Move, Board, NewBoard).
+
 game:-
     display_separator,
     board(Board),
     nextPlayer(Player),
     display_game(Board,Player),
     valid_moves(Board,Player,Moves),
-    until_valid_move(Moves,Board,NewBoard),
+    player_or_ai(Player, Difficulty),
+    (
+        (Difficulty =:= -1,
+        !,
+        player_move(Moves,Board,NewBoard));
+
+        ai_move(Moves,Difficulty,Board,NewBoard)
+    ),
     retract(board(Board)),
     assert(board(NewBoard)),
     (
@@ -275,27 +300,96 @@ game:-
 
 play:-
     prompt(_, ''),
-    repeat,
     display_main_menu,
     getOption(Option),
     (
-        (Option =:= 0);
+        (Option =:= 0,
+        !);
 
         (Option =:= 1,
-        setup,
-        game,
+        !,
+        new_game_menu,
         play);
 
         (Option =:= 2,
         !,
         (
             (match_over(_),
-            setup);
+            write('\n\nSaved game is over\n\n'),
+            play);
 
             (true)
         ),
         game,
         play);
 
-        play
+        (play)
+    ).
+
+new_game_menu:-
+    display_new_game_menu,
+    getOption(Option),
+    (
+        (Option =:= 0,
+        !);
+
+        (Option =:= 1,
+        !,
+        setup(-1,-1),
+        game);
+
+        (Option =:= 2,
+        !,
+        pvAI_menu);
+
+        (Option =:= 3,
+        !,
+        aivAI_menu);
+
+        (new_game_menu)
+    ).
+
+pvAI_menu:-
+    display_PvAI_menu,
+    getOption(Option),
+    (
+        (Option =:= 0,
+        !);
+
+        (Option =:= 1,
+        !,
+        setup(-1,1),
+        game);
+
+        (Option =:= 2,
+        !,
+        setup(-1,3),
+        game);
+
+        (pvAI_menu)
+    ).
+
+aivAI_menu:-
+    display_AIvAI_menu,
+    getOption(Option),
+    (
+        (Option =:= 0,
+        !);
+
+        (Option =:= 1,
+        !,
+        setup(1,1),
+        game);
+
+        (Option =:= 2,
+        !,
+        setup(1,3),
+        game);
+
+        (Option =:= 3,
+        !,
+        setup(3,3),
+        game);
+
+        (aivAI_menu)
     ).
