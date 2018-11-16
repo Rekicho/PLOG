@@ -10,7 +10,7 @@ value(Board,Player,Value):-
     length(Moves,Length),
     Value is -Length.
 
-simulateMoveYuki(Player,Line,Col,Board,Value):-
+simulateMoveYuki(Player,Line,Col,Board,Value,NewBoard):-
     yuki(X,Y),
     (
         (X < 0,
@@ -26,11 +26,9 @@ simulateMoveYuki(Player,Line,Col,Board,Value):-
     NewX is Line - 1,
     NewY is Col - 1,
     assert(yuki(NewX,NewY)),
-    value(NewBoard, Player,Value),
-    retract(yuki(NewX,NewY)),
-    assert(yuki(X,Y)).
+    value(NewBoard,Player,Value).
 
-simulateMoveMina(Player,Line,Col,Board,Value):-
+simulateMoveMina(Player,Line,Col,Board,Value,NewBoard):-
     mina(X,Y),
     beforeMina(Before),
     (
@@ -46,15 +44,15 @@ simulateMoveMina(Player,Line,Col,Board,Value):-
         setPeca(Line,Col,m,Next,NewBoard))
     ),
     retract(mina(X,Y)),
+    retract(beforeMina(Before)),
     NewX is Line - 1,
     NewY is Col - 1,
     assert(mina(NewX,NewY)),
-    value(NewBoard, Player,Value),
-    retract(mina(NewX,NewY)),
-    assert(mina(X,Y)).
+    assert(beforeMina(After)),
+    value(NewBoard,Player,Value).
 
 
-simulateValue(Board,Player,Move,Value):-
+simulateValue(Board,Player,Move,Value,NewBoard):-
     [Line,Col] = Move,
     players(P1,P2),
     (
@@ -68,27 +66,88 @@ simulateValue(Board,Player,Move,Value):-
     C is Col + 1,
     (
         (Name = y,
-        simulateMoveYuki(Player,L,C,Board,Value));
+        simulateMoveYuki(Player,L,C,Board,Value,NewBoard));
 
         (Name = m,
-        simulateMoveMina(Player,L,C,Board,Value))
+        simulateMoveMina(Player,L,C,Board,Value,NewBoard))
     ).
 
-best(_,_,[],Move,_,Move).
+bestNext(Board,Level,Player,Value,NextBoard):-
+    valid_moves(Board,Player,Moves),
+    random_shuffle(Moves,[],RandomMoves),
+    best(Board,Level,Player,RandomMoves,_,-1000,_,Value,_,NextBoard).
 
-best(Board,Player,[Head|Tail],Move,Max,MaxMove):-
-    simulateValue(Board,Player,Head,Value),
+
+best(Board,_,Player,[],Move,MaxValue,Move,MaxValue,FinalBoard,FinalBoard):-
+    simulateValue(Board,Player,Move,_,_).
+
+best(Board,Level,Player,[Head|Tail],Move,Max,MaxMove,MaxValue,MaxBoard,FinalBoard):-
+    (
+        (Level =:= 1,
+        !,
+        yuki(YX,YY),
+        mina(MX,MY),
+        beforeMina(Before),
+        simulateValue(Board,Player,Head,Value,NewBoard),
+        retract(yuki(_,_)),
+        retract(mina(_,_)),
+        retract(beforeMina(_)),
+        assert(yuki(YX,YY)),
+        assert(mina(MX,MY)),
+        assert(beforeMina(Before)));
+
+        (yuki(YX,YY),
+        mina(MX,MY),
+        beforeMina(Before),
+
+        %CHECK VALUE = 0, ALREADY WON/LOST
+        simulateValue(Board,Player,Head,NextValue,NextBoard),
+        (
+                (Player = p1,
+                NextPlayer = p2);
+
+                (Player = p2,
+                NextPlayer = p1)
+        ),
+        NewLevel is Level - 2,
+        bestNext(NextBoard,NewLevel,NextPlayer,NextNextValue,NextNextBoard),
+        bestNext(NextNextBoard,NewLevel,PLayer,Value,NewBoard),
+        retract(yuki(_,_)),
+        retract(mina(_,_)),
+        retract(beforeMina(_)),
+        assert(yuki(YX,YY)),
+        assert(mina(MX,MY)),
+        assert(beforeMina(Before)))
+    ),
     (
         (Value > Max,
         !,
-        best(Board,Player,Tail,Move,Value,Head));
+        best(Board,Level,Player,Tail,Move,Value,Head,MaxValue,NewBoard,FinalBoard));
 
-        (best(Board,Player,Tail,Move,Max,MaxMove))    
+        (best(Board,Level,Player,Tail,Move,Max,MaxMove,MaxValue,MaxBoard,FinalBoard))    
     ).
-    
-%TRANSLATE MOVE
-choose_move(Board, _, Move):-
+
+random_shuffle([],Random,Random).
+
+random_shuffle(Moves,ShuffledMoves,Random):-
+    length(Moves,Length),
+    random(0,Length,Rand),
+    nth0(Rand,Moves,Move),
+    delete(Moves,Move,NewMoves),
+    append(ShuffledMoves,[Move],RandomMoves),
+    random_shuffle(NewMoves,RandomMoves,Random).
+
+choose_move(Board,Level,Move):-
     nextPlayer(Player),
     valid_moves(Board,Player,Moves),
-    Minimum is -1000,
-    best(Board,Player,Moves,Move,Minimum,_).
+    random_shuffle(Moves,[],Random),
+    yuki(YX,YY),
+    mina(MX,MY),
+    beforeMina(Before),
+    best(Board,Level,Player,Random,Move,-1000,_,_,_,_),
+    retract(yuki(_,_)),
+    retract(mina(_,_)),
+    retract(beforeMina(_)),
+    assert(yuki(YX,YY)),
+    assert(mina(MX,MY)),
+    assert(beforeMina(Before)).

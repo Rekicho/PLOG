@@ -9,11 +9,13 @@ display_game(Board,Player):-
     write('\n').
 
 display_board(Counter,[Head]):-
+    write('                                    \n'),
     format('~d ',Counter),
     display_line(Head),
     write('\n\n   a  b  c  d  e  f  g  h  i  j ').
 
 display_board(Counter,[Head|Tail]):-
+    write('                                    \n'),
     format('~d ',Counter),
     display_line(Head),
     write('\n'),
@@ -127,6 +129,8 @@ display_AIvAI_menu:-
 
 display_AI_move(Move):-
     write('\n\nComputer chose Move: '),
-    write(Move),
+    translate_moves([Move],[],Moves),
+    [Translated] = Moves,
+    write(Translated),
     write('\n\n').
 

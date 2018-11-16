@@ -1,4 +1,5 @@
 :- use_module(library(lists)).
+:- use_module(library(random)).
 
 :- reconsult('lists.pl').
 :- reconsult('setup.pl').
@@ -288,31 +289,32 @@ game:-
         display_game_winner(Winner),
         (
             (match_over(MatchWinner),
-            display_match_winner(MatchWinner),
-            play);
+            wins(W1,W2),
+            format('~nWins: ~d-~d~n',[W1,W2]),
+            treesEaten(T1,T2),
+            format('Trees eaten: ~d-~d~n~n',[T1,T2]),
+            display_board(0,NewBoard),
+            display_match_winner(MatchWinner));
 
-            (change_game)
+            (change_game,
+            game)
         ));
 
-        (true)
-    ),
-    game.
+        (game)
+    ).
 
 play:-
     prompt(_, ''),
     display_main_menu,
     getOption(Option),
     (
-        (Option =:= 0,
-        !);
+        (Option =:= 0);
 
         (Option =:= 1,
-        !,
         new_game_menu,
         play);
 
         (Option =:= 2,
-        !,
         (
             (match_over(_),
             write('\n\nSaved game is over\n\n'),
@@ -330,20 +332,16 @@ new_game_menu:-
     display_new_game_menu,
     getOption(Option),
     (
-        (Option =:= 0,
-        !);
+        (Option =:= 0);
 
         (Option =:= 1,
-        !,
         setup(-1,-1),
         game);
 
         (Option =:= 2,
-        !,
         pvAI_menu);
 
         (Option =:= 3,
-        !,
         aivAI_menu);
 
         (new_game_menu)
@@ -353,16 +351,13 @@ pvAI_menu:-
     display_PvAI_menu,
     getOption(Option),
     (
-        (Option =:= 0,
-        !);
+        (Option =:= 0);
 
         (Option =:= 1,
-        !,
         setup(-1,1),
         game);
 
         (Option =:= 2,
-        !,
         setup(-1,3),
         game);
 
@@ -373,21 +368,17 @@ aivAI_menu:-
     display_AIvAI_menu,
     getOption(Option),
     (
-        (Option =:= 0,
-        !);
+        (Option =:= 0);
 
         (Option =:= 1,
-        !,
         setup(1,1),
         game);
 
         (Option =:= 2,
-        !,
         setup(1,3),
         game);
 
         (Option =:= 3,
-        !,
         setup(3,3),
         game);
 
