@@ -1,3 +1,4 @@
+%Executes a Yuki move
 moveYuki(Player,Line,Col,Board,NewBoard):-
     yuki(X,Y),
     treesEaten(T1,T2),
@@ -25,7 +26,8 @@ moveYuki(Player,Line,Col,Board,NewBoard):-
         NewT is T2 + 1,
         assert(treesEaten(T1,NewT)))
     ).
-  
+
+%Checks if a Yuki move is valid
 valid_move_yuki(Board, X, Y, Moves, NewMoves):-
     (
         (X > -1,
@@ -43,6 +45,7 @@ valid_move_yuki(Board, X, Y, Moves, NewMoves):-
         (NewMoves = Moves)
     ).
 
+%Gets all Yuki valid moves
 valid_moves_yuki(Board, ListOfMoves):-
     yuki(X,Y),
     (
@@ -65,6 +68,7 @@ valid_moves_yuki(Board, ListOfMoves):-
         valid_move_yuki(Board, NextX, NextY, Moves7, ListOfMoves))
     ).
 
+%In case both players won as Yuki, solves the tie according to who ate fewer trees
 solve_Yuki_tie(T1,T2,Winner):-
     (
         (T1 > T2,

@@ -12,6 +12,7 @@
 not( X ) :- X, !, fail.
 not( _ ).
 
+%G = Greatest Common Denominator between X and Y
 gcd(X,Y,G):-
     X = Y,
     !,
@@ -28,6 +29,7 @@ gcd(X,Y,G):-
     !,
     gcd(Y, X, G).
 
+%Checks if X and Y are coprime numbers.
 coprime(X,Y):-
     X > 0,
     Y > 0,
@@ -37,6 +39,7 @@ coprime(X,Y):-
 
 untilZero(0,List,List,_).
 
+%Get all possible tree positions in a orthogonal line between Mina and Yuki
 untilZero(Num,List,FullList,Coord):-
     Next is Num - 1,
     (
@@ -57,6 +60,7 @@ allpoints(X,Y,_,DX,DY,List,List):-
     (floor(Y) >= DY,
     !).
 
+%Get all possible tree positions in a diagonal line between Mina and Yuki
 allpoints(X,Y,M,DX,DY,Points,List):-
     (
         (FY is floor(Y),
@@ -70,6 +74,7 @@ allpoints(X,Y,M,DX,DY,Points,List):-
     NextY is Y + M,
     allpoints(NextX,NextY,M,DX,DY,MorePoints,List).
 
+%Get all possible tree positions between Mina and Yuki
 possibleTrees(DX,DY,List):-
     (
         (DX =:= 0,
@@ -88,6 +93,7 @@ possibleTrees(DX,DY,List):-
 
 changeSign(_,_,[],NewList,NewList).
 
+%Changes possible tree position signs relative to where Mina is in relation to where Yuki is
 changeSign(SX,SY,[Head|Tail],LastList,NewList):-
     [X|Y] = Head,
     NewX is X * SX,
@@ -98,6 +104,7 @@ changeSign(SX,SY,[Head|Tail],LastList,NewList):-
 checkTree(_,_,_,[]):-
     fail.
 
+%Checks if there is any tree between Mina and Yuki
 checkTree(X,Y,Board,[Head|Tail]):-
     [DX|DY] = Head,
     Line is X + DX + 1,
@@ -109,6 +116,7 @@ checkTree(X,Y,Board,[Head|Tail]):-
         (checkTree(X,Y,Board,Tail))
     ).
 
+%Gets all possible tree positions between Mina and Yuki and checks to see if they are trees
 checkTrees(X,Y,MX,MY,Board,DX,DY):-
     possibleTrees(DX,DY,List),
     (
@@ -128,6 +136,7 @@ checkTrees(X,Y,MX,MY,Board,DX,DY):-
     changeSign(SX,SY,List,[],NewList),
     checkTree(X,Y,Board,NewList).
 
+%Checks if Yuki can see Mina
 canSee(X,Y,MX,MY,Board):-
     DX is abs(MX - X),
     DY is abs(MY - Y),
@@ -137,6 +146,8 @@ canSee(X,Y,MX,MY,Board):-
         (not(checkTrees(X,Y,MX,MY,Board,DX,DY)))
     ).
 
+%Checks if a move if valid
+%If it is, the move is executed
 move(Move,Board,NewBoard):-
     [X,Y] = Move,
     players(P1,P2),
@@ -168,6 +179,7 @@ move(Move,Board,NewBoard):-
         assert(nextPlayer(p1)))
     ).
 
+%Gets all Player valid moves
 valid_moves(Board, Player, ListOfMoves):-
     players(P1,P2),
     (
@@ -187,6 +199,7 @@ valid_moves(Board, Player, ListOfMoves):-
         !)
     ).
 
+%Loops until user inputs a valid move
 player_move(Moves, Board, NewBoard):-
     repeat,
         display_moves(Moves),
@@ -195,6 +208,7 @@ player_move(Moves, Board, NewBoard):-
         move([Line,Col], Board, NewBoard),
         !.
 
+%Checks if a game is over and returns the game winner
 game_over(Board,Winner):-
     nextPlayer(Player),
     valid_moves(Board,Player,Moves),
@@ -221,6 +235,7 @@ game_over(Board,Winner):-
         Winner = p1)
     ).
 
+%In case both players won a game, solves the tie by looking with what character they won and how many trees they ate
 solve_tie(Winner):-
     treesEaten(T1,T2),
     wonAs(Name),
@@ -232,6 +247,7 @@ solve_tie(Winner):-
         solve_Mina_tie(T1,T2,Winner))
     ).
 
+%When a game is over, checks if the match is over and returns it's winner
 match_over(Winner):-
     wins(W1,W2),
     Wins is W1 + W2,
@@ -250,6 +266,7 @@ match_over(Winner):-
         (solve_tie(Winner))
     ).
 
+%Checks if the current player is human or computer
 player_or_ai(Player, Difficulty):-
     difficulty(D1,D2),
     (
@@ -262,12 +279,14 @@ player_or_ai(Player, Difficulty):-
         Difficulty is D2)
     ).
 
+%Computer chooses the best move according to difficulty and executes it 
 ai_move(Moves,Difficulty,Board,NewBoard):-
     display_moves(Moves),
     choose_move(Board, Difficulty, Move),
     display_AI_move(Move),
     move(Move, Board, NewBoard).
 
+%Game loop
 game:-
     display_separator,
     board(Board),
@@ -303,8 +322,10 @@ game:-
         (game)
     ).
 
+%Starts the game, displaying the main menu
 play:-
     prompt(_, ''),
+    cls,
     display_main_menu,
     getOption(Option),
     (
@@ -329,6 +350,7 @@ play:-
     ).
 
 new_game_menu:-
+    cls,
     display_new_game_menu,
     getOption(Option),
     (
@@ -348,6 +370,7 @@ new_game_menu:-
     ).
 
 pvAI_menu:-
+    cls,
     display_PvAI_menu,
     getOption(Option),
     (
@@ -365,6 +388,7 @@ pvAI_menu:-
     ).
 
 aivAI_menu:-
+    cls,
     display_AIvAI_menu,
     getOption(Option),
     (

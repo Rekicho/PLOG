@@ -1,3 +1,4 @@
+%Executes a Mina move
 moveMina(Line,Col,Board,NewBoard):-
     mina(X,Y),
     beforeMina(Before),
@@ -20,6 +21,7 @@ moveMina(Line,Col,Board,NewBoard):-
     assert(mina(NewX,NewY)),
     assert(beforeMina(After)).
 
+%Checks if a Mina move is valid
 valid_move_mina(Board, X, Y, Moves, NewMoves, DX, DY):-
     (
         (X > -1,
@@ -46,6 +48,8 @@ valid_move_mina(Board, X, Y, Moves, NewMoves, DX, DY):-
 
 checkSeen(_,[],ValidMoves,ValidMoves).
 
+%In the first Mina move, checks all positions to see where Mina can be placed
+%Only restriction is she is not seen by Yuki
 checkSeen(Board,[Head|Tail],ListOfMoves,ValidMoves):-
     [X,Y] = Head,
     yuki(YX,YY),
@@ -61,6 +65,7 @@ checkSeen(Board,[Head|Tail],ListOfMoves,ValidMoves):-
         checkSeen(Board,Tail,MoreMoves,ValidMoves))
     ).
 
+%Gets all Mina valid moves
 valid_moves_mina(Board, ListOfMoves):-
     mina(X,Y),
     (
@@ -83,6 +88,7 @@ valid_moves_mina(Board, ListOfMoves):-
         valid_move_mina(Board, NextX, NextY, Moves7, ListOfMoves, 1, 1))
     ).
 
+%In case both players won as Yuki, solves the tie according to who ate more trees
 solve_Mina_tie(T1,T2,Winner):-
     (
         (T1 > T2,

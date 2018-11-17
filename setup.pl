@@ -39,11 +39,12 @@ board([
 yuki(-1,-1).
 mina(-1,-1).
 %In the start, yuki and mina are not on the board
-beforeMina(m). %In the start, there is nothing in the place where mina is
+beforeMina(m). %Need because mina can move to a tree or a blank space. In the start, there is nothing in the place where mina is
 nextPlayer(p1).
-wonAs(x). %In the start, no one won.
-difficulty(-1,-1).
+wonAs(x). %In the start, no one has won.
+difficulty(-1,-1). %-1 means human player, Default game is player vs player
 
+%Gets all starting possible move for Yuki
 allMoves([
             [0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],
             [1,0],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8],[1,9],
@@ -57,7 +58,7 @@ allMoves([
             [9,0],[9,1],[9,2],[9,3],[9,4],[9,5],[9,6],[9,7],[9,8],[9,9]
         ]).
 
-%Needs to retract in case player plays more than one match
+%Setups the game acording to user difficulty settings
 setup(AI1,AI2):-
     retract(wins(_,_)),
     retract(treesEaten(_,_)),
@@ -81,6 +82,7 @@ setup(AI1,AI2):-
     assert(wonAs(x)),
     assert(difficulty(AI1,AI2)).
 
+%Changes game when the game is over, switching players characters
 change_game:-
     players(P1,P2),
     retract(players(P1,P2)),

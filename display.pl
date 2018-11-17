@@ -55,6 +55,8 @@ write_name(Name):-
 
 translate_moves([],NewMoves,NewMoves).
 
+%Moves are stored internally as [Number,Number] but are displayed to the user as [Number,Char]
+%This translates the moves
 translate_moves([Head|Tail],PastMoves,NewMoves):-
     [X|Y] = Head,
     Code is Y + 97,
@@ -89,7 +91,6 @@ display_separator:-
     write('\n================================\n================================\n').
 
 display_logo:-
-    write('\n\n\n\n\n'),
     write('  ______                             ______                      _\n'),
     write(' |  ____|                           |  ____|                    | |\n'),
     write(' | |__  _ __  ___  ____ ___  _ __   | |__  ___   _ __  ___  ___ | |_\n'),
@@ -134,3 +135,6 @@ display_AI_move(Move):-
     write(Translated),
     write('\n\n').
 
+%Clears the console
+cls:-
+    write('\33\[2J').
