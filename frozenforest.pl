@@ -331,8 +331,7 @@ play:-
         (Option =:= 0);
 
         (Option =:= 1,
-        new_game_menu,
-        play);
+        new_game_menu);
 
         (Option =:= 2,
         (
@@ -342,8 +341,7 @@ play:-
 
             (true)
         ),
-        game,
-        play);
+        game);
 
         (play)
     ).
