@@ -306,13 +306,13 @@ game:-
     (
         (game_over(NewBoard,Winner),
         display_game_winner(Winner),
+        wins(W1,W2),
+        format('~nWins: ~d-~d~n',[W1,W2]),
+        treesEaten(T1,T2),
+        format('Trees eaten: ~d-~d~n~n',[T1,T2]),
+        display_board(0,NewBoard),
         (
             (match_over(MatchWinner),
-            wins(W1,W2),
-            format('~nWins: ~d-~d~n',[W1,W2]),
-            treesEaten(T1,T2),
-            format('Trees eaten: ~d-~d~n~n',[T1,T2]),
-            display_board(0,NewBoard),
             display_match_winner(MatchWinner));
 
             (change_game,
@@ -325,7 +325,6 @@ game:-
 %Starts the game, displaying the main menu
 play:-
     prompt(_, ''),
-    cls,
     display_main_menu,
     getOption(Option),
     (
@@ -354,7 +353,8 @@ new_game_menu:-
     display_new_game_menu,
     getOption(Option),
     (
-        (Option =:= 0);
+        (Option =:= 0,
+        cls);
 
         (Option =:= 1,
         setup(-1,-1),
@@ -374,7 +374,8 @@ pvAI_menu:-
     display_PvAI_menu,
     getOption(Option),
     (
-        (Option =:= 0);
+        (Option =:= 0,
+        cls);
 
         (Option =:= 1,
         setup(-1,1),
@@ -392,7 +393,8 @@ aivAI_menu:-
     display_AIvAI_menu,
     getOption(Option),
     (
-        (Option =:= 0);
+        (Option =:= 0,
+        cls);
 
         (Option =:= 1,
         setup(1,1),
