@@ -28,6 +28,19 @@ buildPositions(Matrix,Cols,[Head|Tail],TempInd,Indexes,Temp,Positions):-
 buildPositions(Matrix,Cols,[_|Tail],TempInd,Indexes,Temp,Positions):-
 	buildPositions(Matrix,Cols,Tail,TempInd,Indexes,Temp,Positions).
 
+buildAllPositions(_,AllPositions,[],[],AllPositions):-
+	!.
+
+buildAllPositions(Indexes,Positions,[HeadIndex|TailIndex],[HeadPosition|TailPosition],AllPositions):-
+	member(HeadIndex,Indexes),
+	!,
+	append(Indexes,[HeadIndex],NewIndexes),
+	append(Positions,[HeadPosition],NewPositions),
+	buildAllPositions(NewIndexes,NewPositions,TailIndex,TailPosition,AllPositions).
+
+buildAllPositions(Indexes,Positions,[_|TailIndex],[_|TailPosition],AllPositions):-
+	buildAllPositions(Indexes,Positions,TailIndex,TailPosition,AllPositions).
+
 restrict(_,_,_,Line,Lines,_,_):-
 	Line > Lines,
 	!.
@@ -44,16 +57,18 @@ restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols):-
 	element(Index,Matrix,Element),
 	attackPositions(Matrix,Code1,Line,Col,Cols,Indexes1,AttackPositions1),
 	attackPositions(Matrix,Code2,Line,Col,Cols,Indexes2,AttackPositions2),
+	buildAllPositions(Indexes1,AttackPositions1,Indexes2,AttackPositions2,AllPositions),
 	count(Code2,AttackPositions1,#=,Attack1),
 	count(Code1,AttackPositions2,#=,Attack2),
 	count(Code1,AttackPositions1,#=,Defend1),
 	count(Code2,AttackPositions2,#=,Defend2),
+	count(Code1,AllPositions,#=,All1),
+	count(Code2,AllPositions,#=,All2),
 		Element #= 32 
 		#\/ 
-		(Element #= Code1 #/\ Attack1 #= 1 #/\ Defend1 #= 0 #/\ Defend2 #= 1)
+		(Element #= Code1 #/\ Attack1 #= 1 #/\ Defend1 #= 0 #/\ Defend2 #= 1 #/\ All2 #\= 2)
 		#\/ 
-		(Element #= Code2 #/\ Attack2 #= 1 #/\ Defend2 #= 0 #/\ Defend1 #= 1),
-	%Criar função que verifica se for codigo 1 -> Index Attack1 != Index Defend2
+		(Element #= Code2 #/\ Attack2 #= 1 #/\ Defend2 #= 0 #/\ Defend1 #= 1 #/\ All1 #\= 2),
 	NextCol is Col + 1,
 	restrict(Matrix,Code1,Code2,Line,Lines,NextCol,Cols).
 
