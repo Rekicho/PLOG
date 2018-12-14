@@ -1,0 +1,16 @@
+attackPositionsQueen(Matrix,Line,Col,Cols,Indexes,Positions):-
+	length(Matrix,Size),
+	Lines is Size div Cols,
+	LastLine is Line - 1,
+	NextLine is Line + 1,
+	LastCol is Col - 1,
+	NextCol is Col + 1,
+	buildPossibleUpLeft(LastLine,LastCol,[],Pos1),
+	buildPossibleUp(LastLine,Col,Pos1,Pos2),
+	buildPossibleUpRight(NextCol,Cols,LastLine,Pos2,Pos3),
+	buildPossibleLeft(LastCol,Line,Pos3,Pos4),
+	buildPossibleRight(NextCol,Cols,Line,Pos4,Pos5),
+	buildPossibleDownLeft(NextLine,Lines,LastCol,Pos5,Pos6),
+	buildPossibleDown(NextLine,Lines,Col,Pos6,Pos7),
+	buildPossibleDownRight(NextLine,Lines,NextCol,Cols,Pos7,Possible),
+	buildPositions(Matrix,Cols,Possible,[],Indexes,[],Positions).
