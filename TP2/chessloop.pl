@@ -8,10 +8,10 @@
 :- reconsult('bishop.pl').
 :- reconsult('queen.pl').
 
-buildPositions(_,_,[],Indexes,Indexes,Positions,Positions):-
+buildPositionsChildren(_,_,[],Indexes,Indexes,Positions,Positions):-
 	!.
 
-buildPositions(Matrix,Cols,[Head|Tail],TempInd,Indexes,Temp,Positions):-
+buildPositionsChildren(Matrix,Cols,[Head|Tail],TempInd,Indexes,Temp,Positions):-
 	[Line,Col] = Head,
 	Line > 0,
 	length(Matrix,Size),
@@ -23,10 +23,57 @@ buildPositions(Matrix,Cols,[Head|Tail],TempInd,Indexes,Temp,Positions):-
 	element(Index,Matrix,Element),
 	append(TempInd,[Index],NextInd),
 	append(Temp,[Element],Next),
+	buildPositionsChildren(Matrix,Cols,Tail,NextInd,Indexes,Next,Positions).
+
+buildPositionsChildren(Matrix,Cols,[_|Tail],TempInd,Indexes,Temp,Positions):-
+	buildPositionsChildren(Matrix,Cols,Tail,TempInd,Indexes,Temp,Positions).
+
+buildPositions(_,_,[],Indexes,Indexes,Positions,Positions):-
+	!.
+
+buildPositions(Matrix,Cols,[Head|Tail],TempInd,Indexes,Temp,Positions):-
+	Head \= [[]],
+	buildPositionsChildren(Matrix,Cols,Head,[],ChildIndexes,[],ChildPositions),
+	ChildIndexes \= [],
+	!,
+	append(TempInd,ChildIndexes,NextInd),
+	append(Temp,[ChildPositions],Next),
 	buildPositions(Matrix,Cols,Tail,NextInd,Indexes,Next,Positions).
 
 buildPositions(Matrix,Cols,[_|Tail],TempInd,Indexes,Temp,Positions):-
 	buildPositions(Matrix,Cols,Tail,TempInd,Indexes,Temp,Positions).
+
+subCountCode(_,_,[],CodeCount):-
+	!,
+	CodeCount #= 0.
+
+subCountCode(CountCode,OtherCode,[Head|Tail],CodeCount):-
+	domain([CodeCount],0,1),
+	subCountCode(CountCode,Tail,Temp),
+	(Head #= CountCode #/\ CodeCount #= 1)
+	#\/
+	(Head #= 32 #/\ CodeCount #= Temp)
+	#\/
+	(Head #= OtherCode #/\ CodeCount #= 0).
+
+countCode(_,_,[],_,CodeCount):-
+	!,
+	CodeCount #= 0.
+
+countCode(CountCode,OtherCode,List,PositionCode,CodeCount):-
+	[Head|Tail] = List,
+	length(List,Max),
+	domain([CodeCount],0,Max),
+	subCountCode(CountCode,OtherCode,Head,Temp),
+	countCode(CountCode,OtherCode,Tail,PositionCode,Rest),
+	CodeCount #= Temp + Rest.
+
+matrixtoList([],List,List):-
+	!.
+
+matrixtoList([Head|Tail],Temp,List):-
+	append(Temp,Head,Next),
+	matrixtoList(Tail,Next,List).
 
 restrict(_,_,_,Line,Lines,_,_,_,_,_):-
 	Line > Lines,
@@ -43,14 +90,16 @@ restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols,LoopMatrix,Loop,LoopIndex):-
 	element(Index,Matrix,Element),
 	attackPositions(Matrix,Code1,Line,Col,Cols,Indexes1,AttackPositions1),
 	attackPositions(Matrix,Code2,Line,Col,Cols,Indexes2,AttackPositions2),
-	count(Code2,AttackPositions1,#=,Attack1),
-	element(LoopIndex1,AttackPositions1,LoopCode2),
+	countCode(Code2,Code1,AttackPositions1,Code1,Attack1),
+	matrixtoList(AttackPositions1,[],ListAttackPositions1),
+	element(LoopIndex1,ListAttackPositions1,LoopCode2),
 	element(LoopIndex1,Indexes1,Index1),
-	count(Code1,AttackPositions2,#=,Attack2),
-	element(LoopIndex2,AttackPositions2,LoopCode1),
+	countCode(Code1,Code2,AttackPositions2,Code2,Attack2),
+	matrixtoList(AttackPositions2,[],ListAttackPositions2),
+	element(LoopIndex2,ListAttackPositions2,LoopCode1),
 	element(LoopIndex2,Indexes2,Index2),
-	count(Code1,AttackPositions1,#=,Defend1),
-	count(Code2,AttackPositions2,#=,Defend2),
+	countCode(Code1,Code2,AttackPositions1,Code1,Defend1),
+	countCode(Code2,Code1,AttackPositions2,Code2,Defend2),
 	!,
 	element(Index,LoopMatrix,LoopMatrixElement),
 	element(LoopIndex,Loop,LoopElement),
@@ -67,11 +116,12 @@ restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols,LoopMatrix,Loop,LoopIndex):-
 	element(Index,Matrix,Element),
 	attackPositions(Matrix,Code1,Line,Col,Cols,_,AttackPositions1),
 	attackPositions(Matrix,Code2,Line,Col,Cols,Indexes2,AttackPositions2),
-	count(Code1,AttackPositions2,#=,Attack2),
-	element(LoopIndex2,AttackPositions2,LoopCode1),
+	countCode(Code1,Code2,AttackPositions2,Code2,Attack2),
+	matrixtoList(AttackPositions2,[],ListAttackPositions2),
+	element(LoopIndex2,ListAttackPositions2,LoopCode1),
 	element(LoopIndex2,Indexes2,Index2),
-	count(Code1,AttackPositions1,#=,Defend1),
-	count(Code2,AttackPositions2,#=,Defend2),
+	countCode(Code1,Code2,AttackPositions1,Code1,Defend1),
+	countCode(Code2,Code1,AttackPositions2,Code2,Defend2),
 	!,
 	element(Index,LoopMatrix,LoopMatrixElement),
 	element(LoopIndex,Loop,LoopElement),
@@ -86,11 +136,12 @@ restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols,LoopMatrix,Loop,LoopIndex):-
 	element(Index,Matrix,Element),
 	attackPositions(Matrix,Code1,Line,Col,Cols,Indexes1,AttackPositions1),
 	attackPositions(Matrix,Code2,Line,Col,Cols,_,AttackPositions2),
-	count(Code2,AttackPositions1,#=,Attack1),
-	element(LoopIndex1,AttackPositions1,LoopCode2),
+	countCode(Code2,Code1,AttackPositions1,Code1,Attack1),
+	matrixtoList(AttackPositions1,[],ListAttackPositions1),
+	element(LoopIndex1,ListAttackPositions1,LoopCode2),
 	element(LoopIndex1,Indexes1,Index1),
-	count(Code1,AttackPositions1,#=,Defend1),
-	count(Code2,AttackPositions2,#=,Defend2),
+	countCode(Code1,Code2,AttackPositions1,Code1,Defend1),
+	countCode(Code2,Code1,AttackPositions2,Code2,Defend2),
 	!,
 	element(Index,LoopMatrix,LoopMatrixElement),
 	element(LoopIndex,Loop,LoopElement),
@@ -148,6 +199,7 @@ display_board([Head|Tail],Col,Cols):-
 	Next is Col + 1,
 	display_board(Tail,Next,Cols).
 
+%TODO: CHANGE PIECES VALUES -> FASTER, SEE LABELING OPTIONS
 chessloop(ID,Matrix):-
 	puzzle(ID,Num,Piece1,Piece2,Lines,Cols),
 	!,

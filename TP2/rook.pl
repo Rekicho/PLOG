@@ -43,8 +43,9 @@ attackPositionsRook(Matrix,Line,Col,Cols,Indexes,Positions):-
 	NextLine is Line + 1,
 	LastCol is Col - 1,
 	NextCol is Col + 1,
-	buildPossibleUp(LastLine,Col,[],Pos1),
-	buildPossibleLeft(LastCol,Line,Pos1,Pos2),
-	buildPossibleRight(NextCol,Cols,Line,Pos2,Pos3),
-	buildPossibleDown(NextLine,Lines,Col,Pos3,Possible),
+	buildPossibleUp(LastLine,Col,[],Up),
+	buildPossibleLeft(LastCol,Line,[],Left),
+	buildPossibleRight(NextCol,Cols,Line,[],Right),
+	buildPossibleDown(NextLine,Lines,Col,[],Down),
+	Possible = [Up,Left,Right,Down],
 	buildPositions(Matrix,Cols,Possible,[],Indexes,[],Positions).

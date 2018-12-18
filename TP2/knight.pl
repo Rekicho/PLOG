@@ -15,5 +15,5 @@ attackPositionsKnight(Matrix,Line,Col,Cols,Indexes,Positions):-
 	DownDownRight = [NextNextLine,NextCol],
 	DownLeftLeft = [NextLine,LastLastCol],
 	DownRightRight = [NextLine,NextNextCol],
-	Possible = [UpUpLeft, UpUpRight, UpLeftLeft, UpRightRight, DownDownLeft, DownDownRight, DownLeftLeft, DownRightRight],
+	Possible = [[UpUpLeft], [UpUpRight], [UpLeftLeft], [UpRightRight], [DownDownLeft], [DownDownRight], [DownLeftLeft], [DownRightRight]],
 	buildPositions(Matrix,Cols,Possible,[],Indexes,[],Positions).

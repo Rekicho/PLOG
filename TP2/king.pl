@@ -11,5 +11,5 @@ attackPositionsKing(Matrix,Line,Col,Cols,Indexes,Positions):-
 	DownLeft = [NextLine,LastCol],
 	Down = [NextLine, Col],
 	DownRight = [NextLine,NextCol],
-	Possible = [UpLeft, Up, UpRight, Left, Right, DownLeft, Down, DownRight],
+	Possible = [[UpLeft], [Up], [UpRight], [Left], [Right], [DownLeft], [Down], [DownRight]],
 	buildPositions(Matrix,Cols,Possible,[],Indexes,[],Positions).

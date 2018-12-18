@@ -61,8 +61,9 @@ attackPositionsBishop(Matrix,Line,Col,Cols,Indexes,Positions):-
 	NextLine is Line + 1,
 	LastCol is Col - 1,
 	NextCol is Col + 1,
-	buildPossibleUpLeft(LastLine,LastCol,[],Pos1),
-	buildPossibleUpRight(NextCol,Cols,LastLine,Pos1,Pos2),
-	buildPossibleDownLeft(NextLine,Lines,LastCol,Pos2,Pos3),
-	buildPossibleDownRight(NextLine,Lines,NextCol,Cols,Pos3,Possible),
+	buildPossibleUpLeft(LastLine,LastCol,[],UpLeft),
+	buildPossibleUpRight(NextCol,Cols,LastLine,[],UpRight),
+	buildPossibleDownLeft(NextLine,Lines,LastCol,[],DownLeft),
+	buildPossibleDownRight(NextLine,Lines,NextCol,Cols,[],DownRight),
+	Possible = [UpLeft,UpRight,DownLeft,DownRight],
 	buildPositions(Matrix,Cols,Possible,[],Indexes,[],Positions).
