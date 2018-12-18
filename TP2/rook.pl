@@ -34,7 +34,7 @@ buildPossibleDown(Line,Lines,Col,Temp,Down):-
 	Pos = [Line,Col],
 	append(Temp,[Pos],NextDown),
 	Next is Line + 1,
-	buildPossibleRight(Next,Lines,Col,NextDown,Down).
+	buildPossibleDown(Next,Lines,Col,NextDown,Down).
 
 attackPositionsRook(Matrix,Line,Col,Cols,Indexes,Positions):-
 	length(Matrix,Size),

@@ -12,7 +12,7 @@ buildPositions(_,_,[],Indexes,Indexes,Positions,Positions):-
 	!.
 
 buildPositions(Matrix,Cols,[Head|Tail],TempInd,Indexes,Temp,Positions):-
-	[Line|Col] = Head,
+	[Line,Col] = Head,
 	Line > 0,
 	length(Matrix,Size),
 	Line =< Size div Cols, 
@@ -49,9 +49,9 @@ restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols,LoopMatrix,Loop,LoopIndex):-
 	count(Code1,AttackPositions2,#=,Attack2),
 	element(LoopIndex2,AttackPositions2,LoopCode1),
 	element(LoopIndex2,Indexes2,Index2),
-	!,
 	count(Code1,AttackPositions1,#=,Defend1),
 	count(Code2,AttackPositions2,#=,Defend2),
+	!,
 	element(Index,LoopMatrix,LoopMatrixElement),
 	element(LoopIndex,Loop,LoopElement),
 		(Element #= 32 #/\ NewLoopIndex #= LoopIndex)
@@ -70,9 +70,9 @@ restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols,LoopMatrix,Loop,LoopIndex):-
 	count(Code1,AttackPositions2,#=,Attack2),
 	element(LoopIndex2,AttackPositions2,LoopCode1),
 	element(LoopIndex2,Indexes2,Index2),
-	!,
 	count(Code1,AttackPositions1,#=,Defend1),
 	count(Code2,AttackPositions2,#=,Defend2),
+	!,
 	element(Index,LoopMatrix,LoopMatrixElement),
 	element(LoopIndex,Loop,LoopElement),
 		(Element #= 32 #/\ NewLoopIndex #= LoopIndex)
@@ -89,9 +89,9 @@ restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols,LoopMatrix,Loop,LoopIndex):-
 	count(Code2,AttackPositions1,#=,Attack1),
 	element(LoopIndex1,AttackPositions1,LoopCode2),
 	element(LoopIndex1,Indexes1,Index1),
-	!,
 	count(Code1,AttackPositions1,#=,Defend1),
 	count(Code2,AttackPositions2,#=,Defend2),
+	!,
 	element(Index,LoopMatrix,LoopMatrixElement),
 	element(LoopIndex,Loop,LoopElement),
 		(Element #= 32 #/\ NewLoopIndex #= LoopIndex)
@@ -105,7 +105,7 @@ restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols,LoopMatrix,Loop,LoopIndex):-
 	element(Index,Matrix,Element),
 	Element #= 32,
 	NextCol is Col + 1,
-	NewLoopIndex #= LoopIndex + 1,
+	NewLoopIndex #= LoopIndex,
 	restrict(Matrix,Code1,Code2,Line,Lines,NextCol,Cols,LoopMatrix,Loop,NewLoopIndex).
 
 buildCircuit(_,_,_,Index,Size):-
