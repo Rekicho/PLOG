@@ -1,3 +1,4 @@
+%Returns in Positions all attacks positions queen has from [Line, Col] and their indexes in Indexes
 attackPositionsQueen(Matrix,Line,Col,Cols,Indexes,Positions):-
 	length(Matrix,Size),
 	Lines is Size div Cols,

@@ -1,3 +1,4 @@
+%Returns in Positions all attacks positions king has from [Line, Col] and their indexes in Indexes
 attackPositionsKing(Matrix,Line,Col,Cols,Indexes,Positions):-
 	LastLine is Line - 1,
 	NextLine is Line + 1,

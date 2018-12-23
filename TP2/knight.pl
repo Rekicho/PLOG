@@ -1,3 +1,4 @@
+%Returns in Positions all attacks positions knight has from [Line, Col] and their indexes in Indexes
 attackPositionsKnight(Matrix,Line,Col,Cols,Indexes,Positions):-
 	LastLastLine is Line - 2,
 	LastLine is Line - 1,

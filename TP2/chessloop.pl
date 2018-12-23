@@ -1,6 +1,8 @@
 :- use_module(library(clpfd)).
+:- use_module(library(random)).
 
 :- reconsult('puzzles.pl').
+:- reconsult('display.pl').
 :- reconsult('pieces.pl').
 :- reconsult('king.pl').
 :- reconsult('knight.pl').
@@ -11,6 +13,7 @@
 buildPositionsChildren(_,_,[],Indexes,Indexes,Positions,Positions):-
 	!.
 
+%Gets valid positions value in a direction
 buildPositionsChildren(Matrix,Cols,[Head|Tail],TempInd,Indexes,Temp,Positions):-
 	[Line,Col] = Head,
 	Line > 0,
@@ -31,6 +34,7 @@ buildPositionsChildren(Matrix,Cols,[_|Tail],TempInd,Indexes,Temp,Positions):-
 buildPositions(_,_,[],Indexes,Indexes,Positions,Positions):-
 	!.
 
+%Gets valid positions value in all directions
 buildPositions(Matrix,Cols,[Head|Tail],TempInd,Indexes,Temp,Positions):-
 	Head \= [[]],
 	buildPositionsChildren(Matrix,Cols,Head,[],ChildIndexes,[],ChildPositions),
@@ -47,6 +51,7 @@ subCountCode(_,_,[],CodeCount):-
 	!,
 	CodeCount #= 0.
 
+%Counts if code apears (1) or not (0) in a list
 subCountCode(CountCode,OtherCode,[Head|Tail],CodeCount):-
 	domain([CodeCount],0,1),
 	subCountCode(CountCode,OtherCode,Tail,Temp),
@@ -60,6 +65,7 @@ countCode(_,_,[],_,CodeCount):-
 	!,
 	CodeCount #= 0.
 
+%Counts in how many directions CountCode appears
 countCode(CountCode,OtherCode,List,PositionCode,CodeCount):-
 	[Head|Tail] = List,
 	length(List,Max),
@@ -71,6 +77,7 @@ countCode(CountCode,OtherCode,List,PositionCode,CodeCount):-
 matrixtoList([],List,List):-
 	!.
 
+%Builds a list from a matrix
 matrixtoList([Head|Tail],Temp,List):-
 	append(Temp,Head,Next),
 	matrixtoList(Tail,Next,List).
@@ -85,6 +92,7 @@ restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols,LoopMatrix,Loop,LoopIndex):-
 	NextLine is Line + 1,
 	restrict(Matrix,Code1,Code2,NextLine,Lines,1,Cols,LoopMatrix,Loop,LoopIndex).
 
+%Applies problem restrictions to all board positions.
 restrict(Matrix,Code1,Code2,Line,Lines,Col,Cols,LoopMatrix,Loop,LoopIndex):-
 	Index is ((Line - 1) * Cols) + Col,
 	element(Index,Matrix,Element),
@@ -163,6 +171,7 @@ buildCircuit(_,_,_,Index,Size):-
 	Index > Size,
 	!.
 
+%Buils the circuit needed to ensure "loop" 
 buildCircuit(Circuit,LoopMatrix,Loop,Index,LoopSize):-
 	element(Index,Circuit,Element),
 	element(Index,Loop,LoopElement),
@@ -171,37 +180,12 @@ buildCircuit(Circuit,LoopMatrix,Loop,Index,LoopSize):-
 	NextIndex is Index + 1,
 	buildCircuit(Circuit,LoopMatrix,Loop,NextIndex,LoopSize).
 
-display_nl(Cols,Cols):-
-	!.
-
-display_nl(Col,Cols):-
-	!,
-	write('--'),
-	Next is Col + 1,
-	display_nl(Next,Cols).
-
-display_board([],_,_):-
-	nl,
-	nl,
-	!.
-
-display_board(Matrix,Cols,Cols):-
-	!,
-	nl,
-	display_nl(0,Cols),
-	nl,
-	display_board(Matrix,0,Cols).
-
-display_board([Head|Tail],Col,Cols):-
-	pieceCode(Piece,Head),
-	write(Piece),
-	write('|'),
-	Next is Col + 1,
-	display_board(Tail,Next,Cols).
-	
-chessloop(ID,Matrix):-
+%Solve a chessloop puzzle with a given ID
+%If the id is negative, generates a random puzzle
+chessloop(ID):-
 	puzzle(ID,Num,Piece1,Piece2,Lines,Cols),
 	!,
+	display_puzzle(Num,Piece1,Piece2,Lines,Cols),
 	pieceCode(Piece1,Code1),
 	pieceCode(Piece2,Code2),
 	Size is Lines * Cols,
@@ -217,5 +201,6 @@ chessloop(ID,Matrix):-
 	length(Circuit,CircuitSize),
 	buildCircuit(Circuit,LoopMatrix,Loop,1,CircuitSize),
 	circuit(Circuit),
-	labeling([down],Matrix),
-	display_board(Matrix,0,Cols).	
+	labeling([ff,down,step],Matrix),
+	!,
+	display_board(Matrix,0,Cols).

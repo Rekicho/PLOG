@@ -1,5 +1,20 @@
-puzzle(0,2,r,b,2,3).
+%Puzzle Information
+%In case ID is negative generates a random puzzle
+puzzle(ID,Num,Piece1,Piece2,Lines,Cols):-	
+	ID < 0,
+	!,
+	repeat,
+	random(2,6,Lines),
+	random(3,9,Cols),
+	random(2,6,Num),
+	random(1,6,Code1),
+	random(1,6,Code2),
+	Code1 =\= Code2,
+	!,
+	pieceCode(Piece1,Code1),
+	pieceCode(Piece2,Code2).
 
+puzzle(0,2,r,b,2,3).
 puzzle(1,2,n,k,2,3).
 puzzle(2,3,n,k,4,5).
 puzzle(3,2,r,k,2,4).
